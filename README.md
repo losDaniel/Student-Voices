@@ -13,7 +13,7 @@ The `rmt_scraper` class is designed to scrape millions of reviews submitted from
 
 Each review scraped included the text of the review submitted, likert scale responses for a number of qualities, and a numeric rating from 1 to 5 (in steps of 0.5) which we later scaled from 0 to 100. 
 
-The scraper can be executed from notebook `(A1) scrape_database`. Basic and detailed summary statistics can be found in notebooks `(A2) explore_clean_setup` and `(A3) teacher_stats` respectively. We used (`git large file storage`)[https://git-lfs.github.com/] to store larger files. 
+The scraper can be executed from notebook `(A1) scrape_database`. Basic and detailed summary statistics can be found in notebooks `(A2) explore_clean_setup` and `(A3) teacher_stats` respectively. We used [`git large file storage`](https://git-lfs.github.com/) to store larger files. 
 
 
 ## The Subjects of Bad Reviews Using LDA
@@ -22,7 +22,7 @@ In the first commit to this repo we uplodaed an analysis of reviews that rated t
 
 To analyze these reviews we experimented using LDA model available through the [`gensim`](https://radimrehurek.com/gensim/index.html) python package. We created a number of personalized visualizations as well as the [`pyLDAvis`](https://pypi.org/project/pyLDAvis/) plug-in for gensim. 
 
-![LDA Topic Visualization]("/graphs/LDA Graphs/Viz_[0, 35)_25_LDA1_A1.html")
+![LDA Topic Visualization](/graphs/LDA Graphs/Viz_[0, 35)_25_LDA1_A1.html)
 
 The results from this analysis are summarized in the "General Conclusions" section of the `(B2) lda_results_0-35` notebook. 
 
