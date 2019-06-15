@@ -22,7 +22,7 @@ In the first commit to this repo we uplodaed an analysis of reviews that rated t
 
 To analyze these reviews we experimented using LDA model available through the [`gensim`](https://radimrehurek.com/gensim/index.html) python package. We created a number of personalized visualizations as well as the [`pyLDAvis`](https://pypi.org/project/pyLDAvis/) plug-in for gensim. 
 
-![LDA Topic Visualization](/graphs/LDA Graphs/Viz_[0, 35)_25_LDA1_A1.html)
+![LDA Topic Visualization](Distance Map - Grouped2.png)
 
 The results from this analysis are summarized in the "General Conclusions" section of the `(B2) lda_results_0-35` notebook. 
 
