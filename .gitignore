@@ -1,0 +1,14 @@
+.ipynb_checkpoints
+__pycache__
+models/D2VA1
+models/D2VE1
+models/FSTB1
+models/W2VA1
+models/W2VE1
+lm_analysis.py
+language_models.ipynb
+language_model_parameters.txt
+data/cleaned_data/vectrain*_full.txt
+data/cleaned_data/cleaned_docs*.pbz2
+data/full_review_text.pbz2
+

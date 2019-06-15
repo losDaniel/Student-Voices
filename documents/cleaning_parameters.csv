@@ -1,0 +1,13 @@
+,A1,B1,C1,E1
+duration,6930.111000061035,3096.3550000190735,6650.566764593124,6146.227561235428
+gram,4,,,5
+lemmatizer,True,False,True,True
+length_post,4863978,4863978,4863978,4863978
+length_prior,4863978,4863978,4863978,4863978
+no_not,,,,"['not', 'off', 'on']"
+pthresh,50,50,50,50
+remove_contractions,True,True,True,True
+remove_stops,True,False,False,True
+repeated_removal,2,,,2
+spell_check,False,False,False,False
+stemmer,True,False,True,False

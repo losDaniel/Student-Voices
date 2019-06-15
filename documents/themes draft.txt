@@ -1,0 +1,17 @@
+
+We will use the first, most coherent trial to guide how we describe the findings of the LDA. We will examine how consistently these themes popped up across the different trials and the percentage of reviews they covered: 
+
+**Theme 1 - Harsh Grade & Too Much Work (%8)**<br> 
+Students complaining about teachers being harsh graders who assign excessive workloads. In the top two trials (by coherence, each with 25 topics) this theme (#0 & #1 respectively) was dominant in aproximately 8% of all 0-35 reviews. In the third trial (with 10 topics) this theme was incorporated in a general topic #1 with other complaints that took up about 14% of reviews. In the forth trial the relevant topic this theme was distributed across several topics regarding teacher quality and most explicity present in topic #13 where Honors & AP students complained explicitly about grades & GPAs which took up 4% of reviews.
+
+**Theme 2 - Bad Testing (9%)**<br>
+Student feeling unprepared for tests and highlighting misalignments between classwork & tests. In trial 1 this theme was captured in topic #1 which took up 8% of reviews. In trial 2 this theme was shared between topics topics #0 (which included tests) and #6 which took up 9% & 5% of reviews respectively. In trial 3 theme 2 was split with theme 1 in topic #1 which took 14% and very specifically highlighted in topic #9 which took 2%. In trial 4 this theme was captured by topic #1 which also captured some of theme 1 and took up 9.5% of reviews.   
+
+**Theme 3 - Confused Students (8-12%)**<br>
+Teachers are give confusing explanations and seem oblivious to how the students are struggling. In trial 1 this was captured by topic #2 which took up 7.5% of reviews. In trial 2 this was captured by topics #6, #8 (smart teachers who can't explain) & #10 (shared with theme 1) which took up 5%, 4.5%  & 4.3% of reviews respectively. In trial 3  this is captured by topic #3 which took up 12% of reviews. In trial 4 this theme comes up in topics #0 & #2 (highlighting communication failure) which took up 12% & 9% of reviews respectively. 
+
+**Theme 4 - Scatterbrains (11%)**
+Teachers who are disorganized, unfocused, go off topic and spend more time talking about things other than the relevant subject matter. In trial 1 this theme was captured by topic #3 & topic #8 which took up 7% & 4.6% of reviews respectively. In trial 2 this theme was captured by topic #11 and topic #16 which took up 4.3% and 3.1% of reviews respectively. In trial 3 this theme is captured by topic #6 which takes up %12 of reviews. In trial 4 this theme was captured by topic #10 & #11 which took up 5% & 4% of reviews respectively. 
+
+**Theme 5 - Can't Teach, Don't Learn**
+Student's who complain about teachers being unable to teach and students not learning a thing in class. In trial 1 this theme was captured by topic #4

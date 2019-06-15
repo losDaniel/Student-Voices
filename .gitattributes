@@ -1,0 +1,4 @@
+data/us_state_city_rmt.zip filter=lfs diff=lfs merge=lfs -text
+data/full_review_text.pbz2 filter=lfs diff=lfs merge=lfs -text
+data/cleaned_data/cleaned_docs*.pbz2 filter=lfs diff=lfs merge=lfs -text
+data/ filter=lfs diff=lfs merge=lfs -text

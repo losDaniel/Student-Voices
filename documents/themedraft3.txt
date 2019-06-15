@@ -1,0 +1,33 @@
+### Theme 1: Overworked & Undergrade (15% of bad reviews)
+
+Check the bubble graph for `EX2` and you will see that topics 10 & 5 clustered together. Topic 10 covered complaints about teachers who were considered harsh graders and students who generally felt overworked. Student reviews dominated by Topic 5 also reflected stressed out students who felt unprepared and complained about poor grades, except reviews in this topics included warning to other students "SWITCH OUT." Nearby was topic 16 in which students described their classes as pointless wastes of time. All together topics 10, 5 & 16 dominated 15.3% of the 0-35 corpus (~32,000 reviews; 7.9%, 4.2% & 3.2% respectively). 
+
+
+<br>***Note on theme subgroups***: *Rather than group them together, we allowed for some differentiation between topics that followed similar themes. This allowed for a more nuanced understanding of both, the reviewers perceptions and the distributions of the same. Theme 2 was the first case where we made this distinction.*
+
+
+### Theme 2.A: Out of Touch - Poor Alignment (15%-19%) 
+
+The bubble graph for `EX2` showed that topics 2, 3 & 12 (og topic numbers 20, 4, 18) clustered together. Reviews dominated by topic 2 criticized teachers inability to prepare students or align tests and classwork. Topic 3 discussed teachers' who had unrealistic expectations and whose explanations left students feeling confused. The overlap between 2 & 3 is evident and together they covered about 15% of reviews. Topic 12 (~4.2%) described teachers as "the worst" without much detail, suggesting that the teachers that most often earned the description of "worst" were those who were out of touch with their students.
+
+### Theme 2.B: Out of Touch - Unhelpful Teachers & Staff (7%)  
+
+Topic 13 highlighted teachers who would not or could not help students. Topic 14 described staff, administrators and teachers who were unable to run a school or classroom in such ways that benefitted students. The overall sentiment seems to highlight high opportunity cost and a general frustration at not being supported. Both topics aproximate the cluster for *Theme 2.A* but hover just above it. Together, topics 13 & 14 take up 7% of the reviews (3.8% & 3.2%). 
+
+### Theme 3.A: Unfit  - Petty, Immature & Unfocused 
+
+Any bad teacher might be called unfit, but these seem to be individuals with personality traits that make them unsuited to deal with or act as role models for classrooms full of teenagers. The first sub-group is comprised of topics 1, 0, and 9. Reviews dominated by topic 1 discussed teachers who talked a lot about nothing. Reviews dominated by topic 0  
+
+
+
+
+
+
+### Theme 4 - Good Time, Bad Teacher (9%) 
+
+Another consistent theme was that of the teacher who didn't make students suffer but were also perceived to fail as teachers. Topic 10 dominated reviews of classes that were easy "A"s but students complained of not learning anything or being unprepared for higher levels. Topic 19 dominated reviews of teachers who were perceived as kind or cool but inadequate as teachers. Students didn't hate them because they didn't fail them but they didn't love them because they didn't teach them. Topic 21 captured sarcasm, positive reviews (erroneously submitted as bad) or teachers who were bad relative to other teachers. All together topics 10, 19 & 21 took up 9% of reviews (4.3%, 2.7% and 2% respectively). 
+
+
+### Theme 4 - Teacher or Powerpoint? 
+
+Topics 23 & 24 both discussed teachers that depended heavily on notes, books, powerpoints, videos and other materials. Teachers' strategies revolved around memorization, students felt they had to teach themselves and that teachers were inflexible when it came to deviating from the material. Together both these topics made up just under 1% of reviews (.57% & .38%). 
