@@ -28,8 +28,8 @@ To analyze these reviews we experimented using LDA model available through the [
 
 The notebooks can be used to run the different stages of the project. Notation: the letter indicates the phase of the project that is being run (i.e. data collection, LDA analysis, language modeling, etc...) and the number indicates the dependency level within the phase. This is only true across phases if the numbering of a given phase does not include earlier numbers. Thus, A1 generates materials necessary for A2, A2 -> A3 & B3, B3 -> B4, but A3 is not needed for B4.  
 
-**(A1) scrape_database.ipynb**: scrapes all or a subset of teachers reviews and stores them in a series of pickle files. 
-**(A2) explore_clean_setup.ipynb**: imports, appends, splits the data into quantitative and text datasets, generates different cleaned versions of the text, provides summary statistics.
-**(A3) teacher_stats.ipynb**: a more in depth look at the quantitative side of the data. 
-**(B3) lda_topics.ipynb**: initial exploration of potential LDA experimentation strategies and execution of a 4-trial lda experiment. 
-**(B4) lda_results_0-35.ipynb**: reviews of LDA outcomes for the 0-35 rated sub-corpus of the entire body of reviews. (Note: this notebook will note render properly on github, to view it fully rendered visit it using nbviewer [here](https://nbviewer.jupyter.org/github/dankundertone/Student-Voices/blob/master/%28B4%29%20lda_results_0-35.ipynb) 
+**(A1) scrape_database.ipynb**: scrapes all or a subset of teachers reviews and stores them in a series of pickle files. <br>
+**(A2) explore_clean_setup.ipynb**: imports, appends, splits the data into quantitative and text datasets, generates different cleaned versions of the text, provides summary statistics.<br>
+**(A3) teacher_stats.ipynb**: a more in depth look at the quantitative side of the data. <br>
+**(B3) lda_topics.ipynb**: initial exploration of potential LDA experimentation strategies and execution of a 4-trial lda experiment. <br>
+**(B4) lda_results_0-35.ipynb**: reviews of LDA outcomes for the 0-35 rated sub-corpus of the entire body of reviews. (Note: this notebook will note render properly on github, to view it fully rendered visit it using nbviewer [here](https://nbviewer.jupyter.org/github/dankundertone/Student-Voices/blob/master/%28B4%29%20lda_results_0-35.ipynb)) <br>
