@@ -32,4 +32,4 @@ The notebooks can be used to run the different stages of the project. Notation: 
 **(A2) explore_clean_setup.ipynb**: imports, appends, splits the data into quantitative and text datasets, generates different cleaned versions of the text, provides summary statistics.
 **(A3) teacher_stats.ipynb**: a more in depth look at the quantitative side of the data. 
 **(B3) lda_topics.ipynb**: initial exploration of potential LDA experimentation strategies and execution of a 4-trial lda experiment. 
-**(B4) lda_results_0-35.ipynb**: reviews of LDA outcomes for the 0-35 rated sub-corpus of the entire body of reviews. 
+**(B4) lda_results_0-35.ipynb**: reviews of LDA outcomes for the 0-35 rated sub-corpus of the entire body of reviews. (Note: this notebook will note render properly on github, to view it fully rendered visit it using nbviewer [here](https://nbviewer.jupyter.org/github/dankundertone/Student-Voices/blob/master/%28B4%29%20lda_results_0-35.ipynb) 
