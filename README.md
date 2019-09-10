@@ -20,7 +20,7 @@ reviews.
 
 In the first commit to this repo we uplodaed an analysis of reviews that rated teachers from 0 to 35 out of 100. This sub-corpus included 359,387 total reviews. We experimented with a number of different cleaning processes and model parameters, before settling on 4 viable candidate parameters for an in depth experimental trial. Some critical findings in early stage tweeking was the importance of setting a minimum review length and incorporating bigram & ngram phrase detection.
 
-To analyze these reviews we experimented using LDA model available through the [`gensim`](https://radimrehurek.com/gensim/index.html) python package. We created a number of personalized visualizations, we also created visualizations using the [`pyLDAvis`](https://pypi.org/project/pyLDAvis/) plug-in for gensim. The results from this analysis are summarized in the "General Conclusions" section of the `(B2) lda_results_0-35` notebook. 
+To analyze these reviews we experimented using LDA model available through the [`gensim`](https://radimrehurek.com/gensim/index.html) python package. We created a number of personalized visualizations, we also created visualizations using the [`pyLDAvis`](https://pypi.org/project/pyLDAvis/) plug-in for gensim. Below is a visualization of the topics (numbered bubbles) and the themes they were grouped into. The results from this analysis are summarized in the "General Conclusions" section of the `(B4) lda_results_0-35` notebook (needs to be updated to align with academic papers). 
 
 ![LDA Topic Visualization](distance_map.png)
 
