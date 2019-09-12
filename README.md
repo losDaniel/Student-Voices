@@ -6,9 +6,9 @@ While the most of the work is compelte, it still needs to be reviewed before it 
 
 **Publications:** 
 
-•	Berliner. David C, et al. [“Is the Teaching Profession Dominated by Bad Teachers? How Would We Know?”](https://www.tcrecord.org/Content.asp?ContentId=22315) Teachers College Record, (2018). 
+Berliner. David C, et al. [“Is the Teaching Profession Dominated by Bad Teachers? How Would We Know?”](https://www.tcrecord.org/Content.asp?ContentId=22315) Teachers College Record, (2018). 
 
-•	Berliner. David C, et al. [“I Went in Loving Math, Left Hating It”](https://www.researchgate.net/publication/335775715_I_Went_in_Loving_Math_Left_Hating_It) Arizona State University. Working Paper  (2019). 
+Berliner. David C, et al. [“I Went in Loving Math, Left Hating It”](https://www.researchgate.net/publication/335775715_I_Went_in_Loving_Math_Left_Hating_It) Arizona State University. Working Paper  (2019). 
 
 ## The Subjects of Bad Reviews Using LDA
 
@@ -45,10 +45,10 @@ The notebooks can be used to run the different stages of the project. Notation: 
 
 ### Dependencies 
 
-* pandas
-* numpy
-* BeautifulSoup
-* selenium
-* nltk
-* gensim 
-* sklearn
+`pip install pandas`
+`pip install numpy`
+`pip install bs4` # BeautifulSoup
+`pip install selenium` # Download the [chromewebdriver](https://chromedriver.chromium.org/downloads)
+`pip install nltk`
+`pip install gensim` 
+`pip install sklearn`
