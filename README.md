@@ -45,10 +45,10 @@ The notebooks can be used to run the different stages of the project. Notation: 
 
 ### Dependencies 
 
-`pip install pandas`
-`pip install numpy`
-`pip install bs4` # BeautifulSoup
-`pip install selenium` # Download the [chromewebdriver](https://chromedriver.chromium.org/downloads)
-`pip install nltk`
-`pip install gensim` 
-`pip install sklearn`
+`pip install pandas`<br>
+`pip install numpy`<br>
+`pip install bs4` # BeautifulSoup<br>
+`pip install selenium` # Download the [chromewebdriver](https://chromedriver.chromium.org/downloads)<br>
+`pip install nltk`<br>
+`pip install gensim`<br>
+`pip install sklearn`<br>
