@@ -323,27 +323,27 @@ def pre_process(text, # a list of texts
 
 # Setup dictionaries 
 def set_dictionary(docs, nb=30, na=0.5):
-	dictionary = Dictionary(docs)
+    dictionary = Dictionary(docs)
 
-	# filter out words that occur less than X documents, or more than Y% of the documents.
-	dictionary.filter_extremes(no_below=nb, no_above=na)
+    # filter out words that occur less than X documents, or more than Y% of the documents.
+    dictionary.filter_extremes(no_below=nb, no_above=na)
 
-	# vectorize the docs by creating bag-of-words representations of the documents.
-	corpus = [dictionary.doc2bow(doc) for doc in docs]
+    # vectorize the docs by creating bag-of-words representations of the documents.
+    corpus = [dictionary.doc2bow(doc) for doc in docs]
 
-	# make an index to word dictionary to feed to the id2word argumend in the lda training command. 
-	temp = dictionary[0]  # This is only to "load" the dictionary.
-	id2word = dictionary.id2token
+    # make an index to word dictionary to feed to the id2word argumend in the lda training command. 
+    temp = dictionary[0]  # This is only to "load" the dictionary.
+    id2word = dictionary.id2token
 
-	# We also need a word to id dictionary for the guided LDA 
-	word2id = {} 
-	for ids in id2word: 
-	    word2id[id2word[ids]] = ids
+    # We also need a word to id dictionary for the guided LDA 
+    word2id = {} 
+    for ids in id2word: 
+        word2id[id2word[ids]] = ids
 
-	# create a list with all the words in the finalized dictionary
-	literal_dictionary = [dictionary[i] for i in dictionary]
+    # create a list with all the words in the finalized dictionary
+    literal_dictionary = [dictionary[i] for i in dictionary]
 
-	return corpus, dictionary, literal_dictionary, id2word, word2id 
+    return corpus, dictionary, literal_dictionary, id2word, word2id 
 
 
 

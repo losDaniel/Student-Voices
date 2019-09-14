@@ -108,7 +108,7 @@ def save_topic_visualization(model, docs, dic, path):
     - show : boolean. Set to true to display the HTML version of the graph 
     '''
     text = [dic.doc2bow(doc) for doc in docs]
-    lda_vis = pyLDAvis.gensim.prepare(model, text, dic, sort_topics = False)
+    lda_vis = pyLDAvis.gensim.prepare(model, text, dic, sort_topics = True)
     # save it to an html format    
     try: 
         pyLDAvis.save_html(lda_vis, path)
@@ -520,6 +520,7 @@ def draw_network_graph(db, save):
 # PLOTTING FOR JUPYTER SPECFICALLY 
 
 # Standard plotly imports
+'''
 import plotly.plotly as py
 import plotly.graph_objs as go
 from plotly.offline import iplot, init_notebook_mode
@@ -559,7 +560,7 @@ def plot_parent_reviews(data, range_indices):
 
     plotdf = topic_dataset.ix[parent_reviews].rename(columns={0:'DomTop'})
     plotdf['DomTop'].iplot(kind='hist', xTitle='topic',yTitle='count', title='Where did the Parent Reviews Go?')
-    
+'''   
     
 # Data Shader Color Pallette 
 # Lookup of web color names to their hex codes.

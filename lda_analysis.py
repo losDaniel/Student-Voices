@@ -1,11 +1,9 @@
 import bear_necessities as bn
 import os
 import time
-import numpy as np
+import pandas as pd
 import modeling_tools as mt
-from gensim.corpora import Dictionary
 import multiprocessing
-import visuals as vs
 from collections import OrderedDict
 from gensim import models
 

@@ -11,4 +11,6 @@ language_model_parameters.txt
 data/cleaned_data/vectrain*_full.txt
 data/cleaned_data/cleaned_docs*.pbz2
 data/full_review_text.pbz2
-
+documents/working
+results/archive/LDA ResultsV1.zip
+models/archive/LDA1_modelsV1.zip
