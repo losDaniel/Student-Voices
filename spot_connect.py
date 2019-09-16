@@ -39,11 +39,6 @@ try:
 except:
     pip._internal.main(['install', 'boto3'])
     import boto3    
-try:
-    from scp import SCPClient
-except:
-    pip._internal.main(['install', 'scp'])
-    from scp import SCPClient
     
 import time, os, sys, argparse, interactive
 
@@ -189,13 +184,15 @@ def launch_spot_instance(spotid, profile, spot_wait_sleep=5, instance_wait_sleep
                 raise Exception('Spot Request Failed')
             if 'InstanceId' in spot_req:                                       # If an instance ID was returned with the spot request we exit the while loop 
                 instance_id = spot_req['InstanceId']
-            else: 
-                print('.')                                                     # Otherwise we continue to wait 
+            else:                                                              # Otherwise we continue to wait 
+                sys.stdout.write(".")
+                sys.stdout.flush()                                                   
                 time.sleep(spot_wait_sleep)
         else: 
             if attempt==0:
                 print('Launching...')
-            print('.')                                                         # If a new spot request was submitted it may take a moment to register
+            sys.stdout.write(".")
+            sys.stdout.flush()                                                 # If a new spot request was submitted it may take a moment to register
             time.sleep(spot_wait_sleep)                                        # Wait and attempt to connect again 
             attempt+=1 
 
@@ -210,7 +207,8 @@ def launch_spot_instance(spotid, profile, spot_wait_sleep=5, instance_wait_sleep
     attempt = 0 
     instance_up = False
     while not instance_up:
-        print('.')
+        sys.stdout.write(".")
+        sys.stdout.flush() 
         instance_status = client.describe_instance_status(InstanceIds=[instance_id])['InstanceStatuses'][0]['InstanceStatus']['Status']
         if instance_status!='initializing':
             instance_up=True        
@@ -248,17 +246,16 @@ def connect_to_instance(ip, keyfile, username='ec2-user', port=22, timeout=10):
         try:
             # use the public IP address to connect to an instance over the internet, default username is ubuntu
             ssh_client.connect(ip, username=username, pkey=k, port=port, timeout=timeout)
-            console = ssh_client.invoke_shell()                                # Recently added 
-            console.keep_this = ssh_client                                     # Also
             connected = True
             break
         except Exception as e:
             retries+=1 
-            print('.')
+            sys.stdout.write(".")
+            sys.stdout.flush() 
             if retries>=5: 
                 raise e  
     print('Connected')
-    return console                                                             # changed from ssh_client
+    return ssh_client
 
 
 
@@ -303,7 +300,9 @@ def active_shell(instance, user_name, port=22):
     '''    
     
     client = connect_to_instance(instance['PublicIpAddress'],instance['KeyName'],username=user_name,port=port)
-    session = client.get_transport().open_session()
+    console = client.invoke_shell()                                            
+    console.keep_this = client                                                
+    session = console.get_transport().open_session()
     session.get_pty()
     session.invoke_shell()
     interactive.interactive_shell(session)
@@ -331,7 +330,8 @@ def launch_efs(system_name, region='us-west-2', launch_wait=3):
                 file_system = client.describe_file_systems(CreationToken=system_name)['FileSystems'][0]
                 initiated=True
             except: 
-                print('.')
+                sys.stdout.write(".")
+                sys.stdout.flush() 
                 time.sleep(launch_wait)
         print('Detected')
     else: 
@@ -346,7 +346,8 @@ def launch_efs(system_name, region='us-west-2', launch_wait=3):
             available=True
             print('Available')
         else: 
-            print('.')
+            sys.stdout.write(".")
+            sys.stdout.flush() 
             time.sleep(launch_wait)
         
     return file_system 
@@ -395,7 +396,8 @@ def retrieve_efs_mount(file_system_name, instance, region='us-west-2', mount_wai
                 mount_target = client.describe_mount_targets(MountTargetId=response['MountTargetId'])['MountTargets'][0]
                 initiated = True 
             except: 
-                print('.')
+                sys.stdout.write(".")
+                sys.stdout.flush() 
                 time.sleep(mount_wait)
         print('Detected')
     else: 
@@ -417,6 +419,14 @@ def retrieve_efs_mount(file_system_name, instance, region='us-west-2', mount_wai
 
 
 
+def printTotals(transferred, toBeTransferred):
+    '''Print paramiko upload transfer'''
+    print("Transferred: %.3f" % float(float(transferred)/float(toBeTransferred)), end="\r", flush=True)
+#	sys.stdout.write("Transferred: {0}\tOut of: {1}".format(transferred, toBeTransferred))
+#	sys.stdout.flush()
+
+
+
 def upload_to_ec2(instance, user_name, files, remote_dir=b'.'):
     '''
     Upload files directly to an EC2 instance. This method can be slow. 
@@ -430,10 +440,12 @@ def upload_to_ec2(instance, user_name, files, remote_dir=b'.'):
     print('Connecting...')
     client = connect_to_instance(instance['PublicIpAddress'],instance['KeyName'],username='ec2-user',port=22)
     print('Connected. Uploading files...')
-    scp = SCPClient(client.get_transport())
+    stfp = client.open_sftp()
     try: 
-        scp.put(files, recursive=True, remote_path=remote_dir)
-    except Exception as e: 
+    	for f in files: 
+            print('Uploading %s' % str(f.split('\\')[-1]))
+            stfp.put(f, remote_dir+'/'+f.split('\\')[-1], callback=printTotals, confirm=True)
+    except Exception as e:
         raise e
     print('Uploaded to %s' % remote_dir)
     return True 
@@ -509,11 +521,15 @@ if __name__ == '__main__':                                                     #
         print('Connecting to instance to link EFS...')
         run_script(instance, profile['username'], 'efs_mount.sh')
             
+    st = time.time() 
+
     if args.upload!='':        
         files_to_upload = [] 
         for file in args.upload.split(','):
             files_to_upload.append(os.path.abspath(file))
         upload_to_ec2(instance, profile['username'], files_to_upload, remote_dir=args.remotepath)    
+
+    print('Time to Upload: %s' % str(time.time()-st))
     
     for script in profile['scripts'] + args.script:
         print('\nExecuting script "%s"...' % str(script))
