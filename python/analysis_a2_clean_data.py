@@ -178,10 +178,10 @@ if __name__ == '__main__':
     # Change the directory to the home directory. 
     os.chdir("/home/ec2-user/efs")
 
-    sys.stdout.write('Beginning in '+os.getcwd()+'\n')
+    sys.stdout.write('Beginning in '+os.getcwd())
     # if the data is not present in the data directory create the datasets from the raw data   
     if not (os.path.exists(os.getcwd()+'/data/review_stats.pbz2') and os.path.exists(os.getcwd()+'/data/full_review_text.pbz2')):
-        sys.stdout.write("Generating data..."+'\n')
+        sys.stdout.write("Generating data...")
         gen_data()
     sys.stdout.write('1')
 
