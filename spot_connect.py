@@ -549,7 +549,12 @@ if __name__ == '__main__':                                                     #
 
         st = time.time() 
         
-        for script in profile['scripts'] + args.script.split(','):
+        scripts_to_run = []
+        if args.script!= '': 
+            for s in args.script.split(','):
+                scripts_to_run.append(s)
+
+        for script in profile['scripts']:
             print('\nExecuting script "%s"...' % str(script))
             if not run_script(instance, profile['username'], script):
                 break
