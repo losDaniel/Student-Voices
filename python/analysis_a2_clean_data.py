@@ -176,8 +176,10 @@ def clean_data(config, text, data_configurations):
 if __name__ == '__main__':
 
     # Change the directory to the home directory. 
-    os.chdir('..')
-    os.chdir('..')
+    cdir = ''
+    while cdir!="/home/ec2-user/efs":
+        os.chdir('..')
+        cdir = os.getcwd()
 
     sys.stdout.write('Beginning in '+os.getcwd())
     # if the data is not present in the data directory create the datasets from the raw data   

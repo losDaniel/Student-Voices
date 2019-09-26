@@ -55,12 +55,10 @@ except:
 
 cpu_count = multiprocessing.cpu_count()
 
-# Change the directory to the home directory. 
-print(os.getcwd())
-os.chdir('..')
-print(os.getcwd())
-os.chdir('..')
-print(os.getcwd())
+cdir = ''
+while cdir!="/home/ec2-user/efs":
+    os.chdir('..')
+    cdir = os.getcwd()
 
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 #-# 1. TEXT CLEANING METHODS  #-#-#-#-#-#
