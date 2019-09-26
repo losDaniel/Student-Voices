@@ -80,6 +80,61 @@ for w in open(os.getcwd()+'/data/stop_words.txt','r').read().replace('\n','').re
     if w not in stops: stops.append(w.strip())
    
      
+# Main pre-processing function  
+def pre_process(text, # a list of texts 
+                lemmatizer=True, # do you want to lemmatize the text 
+                stemmer=True, # do you want to stem the text 
+                remove_stops=True, # do you want to remove stops 
+                no_not= None, # list of stop words you do not want to remove 
+                remove_contractions=True, # do you want to replace contractions 
+                repeated_removal=2, # remove characters that repeat at least this number of times, set to None to cancel
+                gram = 4, # None if you do not want to find phrases, find phrases of up to this number of words
+                pthresh = 20, # how many times must a phrase appear to be included
+                spell_check = False, # set to True if you want to use TextBlob to correct misspellings
+                threads = None # set to some integer equal to the number of cores you want to use 
+                ):
+    # omit the threading process, no signficant speed-up & unrealiable doc ordering
+    threads = None 
+    if threads is not None: 
+        print('ommitted')
+        '''
+        # parse the text equal chunks for each processor
+        text_segments = bn.chunkify(text, threads)
+        
+        args = [(text,
+                 lemmatizer,
+                 stemmer,
+                 remove_stops,
+                 no_not,
+                 remove_contractions,
+                 repeated_removal,
+                 spell_check) for text in text_segments]
+        for a in args:
+            print(len(a))
+        docs, stem_map, lemma_map = thread_cleaning(args, threads)
+        '''
+
+    else: 
+        # default stemmer is nltk's PorterStemmer, but other stemmers or lematizers can be submitted
+        docs, stem_map, lemma_map = clean_docs(text, 
+                                               lemmatizer=lemmatizer, 
+                                               stemmer=stemmer, 
+                                               remove_stops=remove_stops, 
+                                               no_not=no_not,
+                                               remove_contractions=remove_contractions, 
+                                               repeated_removal=repeated_removal,
+                                               spell_check=spell_check) 
+        
+    # we find bigrams and return a dictionary of phrase frequency as well 
+    if gram is None: 
+        phrase_dict = {}
+    else: 
+        docs, phrase_dict = find_phrases(docs, 
+                                         phrase_thresh=pthresh, 
+                                         gram=gram)
+
+    return docs, stem_map, lemma_map, phrase_dict
+
 # first cleaning function 
 def clean_docs(docs, # list of text documents (not tokenized)
                lemmatizer=True, # lemmatize documents 
@@ -96,7 +151,7 @@ def clean_docs(docs, # list of text documents (not tokenized)
     tokenizer = RegexpTokenizer(r'\w+')
     st = time.time()
     pt = time.time()
-    sys.stdout.write('Begnning Doc-wise Cleaning...')
+    print('Begnning Doc-wise Cleaning...'+'\n', flush=True)
     for idx in range(0,len(docs)):
         # remove unicode spacing characters 
         docs[idx] = docs[idx].replace('\r',' ')
@@ -128,18 +183,18 @@ def clean_docs(docs, # list of text documents (not tokenized)
         # split into words 
         docs[idx] = tokenizer.tokenize(docs[idx])  
         if np.mod(idx,10000)==0:
-            sys.stdout.write(str((idx/len(docs))*100)+'%'+' Time: '+str(time.time()-st)+' Rate: '+str((time.time()-pt)))
+            print(str((idx/len(docs))*100)+'%'+' Time: '+str(time.time()-st)+' Rate: '+str((time.time()-pt))+'\n', flush=True)
             pt = time.time()
 
-    sys.stdout.write('Basic Cleaning: Complete') 
+    print('Basic Cleaning: Complete'+'\n', flush=True) 
     
     # Remove numbers, but not words that contain numbers. for the rmt corpus this is very useful in separating "grade" from "10th grade", "9th grade", ... which have very different meanings
     docs = [[token for token in doc if not token.isnumeric()] for doc in docs]
-    sys.stdout.write('Filtering Out Numerics: Complete')
+    print('Filtering Out Numerics: Complete'+'\n', flush=True)
 
     # Remove words that are only one character. 
     docs = [[token for token in doc if len(token) > 1] for doc in docs] 
-    sys.stdout.write('Remove One Character Words: Complete')
+    print('Remove One Character Words: Complete'+'\n', flush=True)
     
     # remove stop words 
     if remove_stops: 
@@ -152,7 +207,7 @@ def clean_docs(docs, # list of text documents (not tokenized)
                 except:
                     pass
         docs = [[token for token in doc if token not in stop_words] for doc in docs] 
-        sys.stdout.write('Stop Word Removal: Complete')
+        print('Stop Word Removal: Complete'+'\n', flush=True)
     
     # we can use the textblob module to implement spell_check and auto-corrections (this is even capable of capturing slang)
     if spell_check: 
@@ -163,18 +218,18 @@ def clean_docs(docs, # list of text documents (not tokenized)
                     corrections[token] = str(TextBlob(token).correct()) 
         # when textblob fails to recognize a word it returns the same word
         docs = [[corrections[token] for token in doc] for doc in docs]            
-        sys.stdout.write('Spell Check: Complete')
+        print('Spell Check: Complete'+'\n', flush=True)
     
     # we're going to stem the words but create a map so we can trace the words back. We do so by using the populate stems function defined above 
     lemma_map = {}
     if lemmatizer: 
         docs = [[populate_stems(token, lemma_map, stemmer = WordNetLemmatizer()) for token in doc] for doc in docs]
-        sys.stdout.write('Lemmatization: Complete')
+        print('Lemmatization: Complete'+'\n', flush=True)
 
     stem_map = {}
     if stemmer: 
         docs = [[populate_stems(token, stem_map, stemmer = PorterStemmer()) for token in doc] for doc in docs]
-        sys.stdout.write('Stemming: Complete')
+        print('Stemming: Complete'+'\n', flush=True)
         
     return docs, stem_map, lemma_map
     
@@ -239,62 +294,6 @@ def find_phrases(docs, phrase_thresh = 40, gram = 2):
         g += 1 
 
     return docs, phrase_voc
-
-
-# Main pre-processing function  
-def pre_process(text, # a list of texts 
-                lemmatizer=True, # do you want to lemmatize the text 
-                stemmer=True, # do you want to stem the text 
-                remove_stops=True, # do you want to remove stops 
-                no_not= None, # list of stop words you do not want to remove 
-                remove_contractions=True, # do you want to replace contractions 
-                repeated_removal=2, # remove characters that repeat at least this number of times, set to None to cancel
-                gram = 4, # None if you do not want to find phrases, find phrases of up to this number of words
-                pthresh = 20, # how many times must a phrase appear to be included
-                spell_check = False, # set to True if you want to use TextBlob to correct misspellings
-                threads = None # set to some integer equal to the number of cores you want to use 
-                ):
-    # omit the threading process, no signficant speed-up & unrealiable doc ordering
-    threads = None 
-    if threads is not None: 
-        print('ommitted')
-        '''
-        # parse the text equal chunks for each processor
-        text_segments = bn.chunkify(text, threads)
-        
-        args = [(text,
-                 lemmatizer,
-                 stemmer,
-                 remove_stops,
-                 no_not,
-                 remove_contractions,
-                 repeated_removal,
-                 spell_check) for text in text_segments]
-        for a in args:
-            print(len(a))
-        docs, stem_map, lemma_map = thread_cleaning(args, threads)
-        '''
-
-    else: 
-        # default stemmer is nltk's PorterStemmer, but other stemmers or lematizers can be submitted
-        docs, stem_map, lemma_map = clean_docs(text, 
-                                               lemmatizer=lemmatizer, 
-                                               stemmer=stemmer, 
-                                               remove_stops=remove_stops, 
-                                               no_not=no_not,
-                                               remove_contractions=remove_contractions, 
-                                               repeated_removal=repeated_removal,
-                                               spell_check=spell_check) 
-        
-    # we find bigrams and return a dictionary of phrase frequency as well 
-    if gram is None: 
-        phrase_dict = {}
-    else: 
-        docs, phrase_dict = find_phrases(docs, 
-                                         phrase_thresh=pthresh, 
-                                         gram=gram)
-
-    return docs, stem_map, lemma_map, phrase_dict
 
 
 
