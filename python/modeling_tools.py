@@ -1,52 +1,70 @@
-"""
-@author: Carlos Valcarcel
-# -*- coding: utf-8 -*-
-
-Methods to help clean and train LDA models on multiple cores
-"""
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 #-# 1. TEXT CLEANING METHODS  #-#-#-#-#-#
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
-#-# 2. POST CLEANING SETUP FUNCTIONS  #-#
+#-# 2. SAVE TEXT AS NEWLINE FOR GENSIM  #
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 #-# 3. MODELING FUNCTIONS   #-#-#-#-#-#-#
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 
-from nltk.stem.wordnet import WordNetLemmatizer
-from nltk.stem.porter import PorterStemmer
-from nltk.corpus import stopwords
-from nltk.tokenize import RegexpTokenizer
-from gensim.models.phrases import Phrases, Phraser
-from gensim.utils import save_as_line_sentence
-from multiprocessing.dummy import Pool as ThreadPool 
-from collections import OrderedDict
-from collections import defaultdict
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.svm import LinearSVC 
-from gensim.corpora import Dictionary
-from gensim import models
-import guidedlda
-from textblob import TextBlob
 import os
 import re 
 import multiprocessing
 import string
-import bear_necessities as bn
+import utils as bn
 import numpy as np
-import pandas as pd
+import time
+import sys
+
+import pip._internal
+try:
+    import pandas as pd 
+except:
+    pip._internal.main(['install', 'pandas'])
+    import pandas as pd 
+
+try:
+    from nltk.stem.wordnet import WordNetLemmatizer
+except:
+    pip._internal.main(['install', 'nltk'])
+    from nltk.stem.wordnet import WordNetLemmatizer
+    
+from nltk.stem.porter import PorterStemmer
+from nltk.corpus import stopwords
+from nltk.tokenize import RegexpTokenizer
+
+try:
+    from gensim.models.phrases import Phrases, Phraser
+except:
+    pip._internal.main(['install', 'gensim'])
+    from gensim.models.phrases import Phrases, Phraser
+from gensim.utils import save_as_line_sentence
+from gensim.corpora import Dictionary
+
+try: 
+    from sklearn.feature_extraction.text import TfidfVectorizer
+except: 
+    pip._internal.main(['install','sklearn'])
+    from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.svm import LinearSVC 
+
+try: 
+    from textblob import TextBlob
+except: 
+    pip._internal.main(['install','TextBlob'])
+    from textblob import TextBlob
 
 cpu_count = multiprocessing.cpu_count()
 
+# Change the directory to the home directory. 
+os.chdir('..')
 
-
-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
-#-#-# TEXT CLEANING METHODS #-#-#
-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
-
+#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
+#-# 1. TEXT CLEANING METHODS  #-#-#-#-#-#
+#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 
 
 # import contractions dictionary 
-contractions = bn.loosen('contractions.pickle')
+contractions = bn.loosen(os.getcwd()+'/data/contractions.pickle')
 cnt = {} # we need to create a version the contractions that is compatible with the cleaning step (where apostrophes and lower case has been implemented)
 for c in contractions: 
     w = c.lower().replace("'","")
@@ -55,16 +73,14 @@ contractions = cnt
 del cnt
 
 
-
 # import stop words 
 stops = set(stopwords.words('english'))
 stops = [s.replace("'",'') for s in stops]
 # pull in other stop words that have been added manually
-for w in open('stop_words.txt','r').read().replace('\n','').replace("'","").split(','):
+for w in open(os.getcwd()+'/data/stop_words.txt','r').read().replace('\n','').replace("'","").split(','):
     if w not in stops: stops.append(w.strip())
-
-
-        
+   
+     
 # first cleaning function 
 def clean_docs(docs, # list of text documents (not tokenized)
                lemmatizer=True, # lemmatize documents 
@@ -77,9 +93,12 @@ def clean_docs(docs, # list of text documents (not tokenized)
                ): 
     '''Clean the documents and return the cleaned documents, a map of stemmed words, and a map of phrases their frequency.'''
         
+    notebook = bn.notes("output.txt")
+        
     # instantiate a tokenizer 
     tokenizer = RegexpTokenizer(r'\w+')
-        
+    st = time.time()
+    notebook.write('Begnning Doc-wise Cleaning...')
     for idx in range(0,len(docs)):
         # remove unicode spacing characters 
         docs[idx] = docs[idx].replace('\r',' ')
@@ -110,13 +129,19 @@ def clean_docs(docs, # list of text documents (not tokenized)
         docs[idx] = re.sub('yrs','years', docs[idx])
         # split into words 
         docs[idx] = tokenizer.tokenize(docs[idx])  
-        
+        if np.mod(idx,10000)==0:
+            notebook.write(str((idx/len(docs))*100),'%%','Time:',str(time.time()-st))
+
+    notebook.write('Basic Cleaning: Complete') 
+    
     # Remove numbers, but not words that contain numbers. for the rmt corpus this is very useful in separating "grade" from "10th grade", "9th grade", ... which have very different meanings
     docs = [[token for token in doc if not token.isnumeric()] for doc in docs]
+    notebook.write('Filtering Out Numerics: Complete')
 
     # Remove words that are only one character. 
     docs = [[token for token in doc if len(token) > 1] for doc in docs] 
-
+    notebook.write('Remove One Character Words: Complete')
+    
     # remove stop words 
     if remove_stops: 
         stop_words = stops.copy()
@@ -128,7 +153,8 @@ def clean_docs(docs, # list of text documents (not tokenized)
                 except:
                     pass
         docs = [[token for token in doc if token not in stop_words] for doc in docs] 
-
+        notebook.write('Stop Word Removal: Complete')
+    
     # we can use the textblob module to implement spell_check and auto-corrections (this is even capable of capturing slang)
     if spell_check: 
         corrections = {} # TextBlob takes a bit to run so to avoid repeating lookups we create a dictionary 
@@ -138,19 +164,22 @@ def clean_docs(docs, # list of text documents (not tokenized)
                     corrections[token] = str(TextBlob(token).correct()) 
         # when textblob fails to recognize a word it returns the same word
         docs = [[corrections[token] for token in doc] for doc in docs]            
-
+        notebook.write('Spell Check: Complete')
+    
     # we're going to stem the words but create a map so we can trace the words back. We do so by using the populate stems function defined above 
     lemma_map = {}
     if lemmatizer: 
         docs = [[populate_stems(token, lemma_map, stemmer = WordNetLemmatizer()) for token in doc] for doc in docs]
+        notebook.write('Lemmatization: Complete')
+
     stem_map = {}
     if stemmer: 
         docs = [[populate_stems(token, stem_map, stemmer = PorterStemmer()) for token in doc] for doc in docs]
+        notebook.write('Stemming: Complete')
         
     return docs, stem_map, lemma_map
     
 
-    
 # Creating and indexing stems or lemmatizations 
 def populate_stems(word, # the word you want to stem or lemmatize
                    stem_map, # a stem frequency map/dictionary 
@@ -186,7 +215,6 @@ def populate_stems(word, # the word you want to stem or lemmatize
     return tok
 
 
-
 # Identify and return phrases 
 def find_phrases(docs, phrase_thresh = 40, gram = 2):
     '''
@@ -212,50 +240,6 @@ def find_phrases(docs, phrase_thresh = 40, gram = 2):
         g += 1 
 
     return docs, phrase_voc
-
-
-# omit threading functions because they provide no significant speed-up & unrealiable ordering of results 
-'''
-# consolidate stems that result from threading
-def consolidate_stem_maps(maps):
-    smap = {} 
-    for d in maps:
-        for k in d: 
-            if k in smap: 
-                for e in d[k]:
-                    if e in smap[k]:
-                        smap[k][e] += d[k][e]
-                    else: 
-                        smap[k][e] = d[k][e]
-            else:
-                smap[k] = {} 
-                for e in d[k]:
-                    smap[k][e] = d[k][e]
-    return smap 
-
-
-# enable threaded cleaning 
-def thread_cleaning(args, # list of tuples with arguments  
-                    workers): # number of workers 
-    
-    pool = ThreadPool(workers)
-    
-    out = pool.starmap(clean_docs, args)
-    
-    docs=[]
-    stem_maps=[]
-    lemma_maps=[]
-    for a in out: 
-        for doc in a[0]:
-            docs.append(doc)
-        stem_maps.append(a[1])
-        lemma_maps.append(a[2])
-    
-    stem_map = consolidate_stem_maps(stem_maps)
-    lemma_map = consolidate_stem_maps(lemma_maps)
-
-    return docs, stem_map, lemma_map
-'''
 
 
 # Main pre-processing function  
@@ -316,9 +300,36 @@ def pre_process(text, # a list of texts
 
 
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
-#-#-# POST CLEANING SETUP FUNCTIONS #-#-#
+#-# 2. SAVE TEXT AS NEWLINE FOR GENSIM  #
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 
+
+# Save training data as line by line text files, speeds up gensim functions considerably
+def setup_filebase(docs, none_below, not_above, filename, overwrite=True):
+    '''Sets up line by line text files for Gensim training'''
+
+    # load in the documents (cleaned, )
+    data, dictionary, literal_dictionary, id2word, word2id = setup_text_training_data(docs, none_below, not_above)
+
+    # save the corpus in the .txt format needed for filebased training  
+    txtfile = os.getcwd() + '/data/cleaned_data/vectrain_'+filename+'.txt'
+    if overwrite: # create or overwrite the text file 
+        save_as_line_sentence(data, txtfile)    
+    elif not os.path.exists(txtfile):
+        save_as_line_sentence(data, txtfile)  
+
+    return txtfile, dictionary
+
+
+# clean the corpus and return training data (This is necessary when filtering a corpus will leave you with empty documents, this is unlikely in cases where review length is controlled) 
+def setup_text_training_data(docs, none_below, not_above):
+
+    # populate the dictionary elements and filter out low and high occurring words
+    corpus, dictionary, literal_dictionary, id2word, word2id = set_dictionary(docs, nb=none_below, na=not_above)
+    # use the literal dictionary to filter the docs with the dictionary created in gensim
+    data = filter_corpus(docs, literal_dictionary) 
+
+    return data, dictionary, literal_dictionary, id2word, word2id
 
 
 # Setup dictionaries 
@@ -346,7 +357,6 @@ def set_dictionary(docs, nb=30, na=0.5):
     return corpus, dictionary, literal_dictionary, id2word, word2id 
 
 
-
 # Clean corpus to match dictionary filters 
 def filter_corpus(docs, lit_dict): # do not apply if using stanford NLP Parser
     '''Only keep the words in the dictionary'''
@@ -359,40 +369,9 @@ def filter_corpus(docs, lit_dict): # do not apply if using stanford NLP Parser
 
 
 
-# clean the corpus and return training data (This is necessary when filtering a corpus will leave you with empty documents, this is unlikely in cases where review length is controlled) 
-def setup_text_training_data(docs, none_below, not_above):
-
-    # populate the dictionary elements and filter out low and high occurring words
-    corpus, dictionary, literal_dictionary, id2word, word2id = set_dictionary(docs, nb=none_below, na=not_above)
-    # use the literal dictionary to filter the docs with the dictionary created in gensim
-    data = filter_corpus(docs, literal_dictionary) 
-
-    return data, dictionary, literal_dictionary, id2word, word2id
-
-
-
-# Save training data as line by line text files 
-def setup_filebase(docs, none_below, not_above, filename, overwrite=True):
-    '''Sets up line by line text files for Gensim training'''
-
-    # load in the documents (cleaned, )
-    data, dictionary, literal_dictionary, id2word, word2id = setup_text_training_data(docs, none_below, not_above)
-
-    # save the corpus in the .txt format needed for filebased training  
-    txtfile = os.getcwd() + '/data/cleaned_data/vectrain_'+filename+'.txt'
-    if overwrite: # create or overwrite the text file 
-        save_as_line_sentence(data, txtfile)    
-    elif not os.path.exists(txtfile):
-        save_as_line_sentence(data, txtfile)  
-
-    return txtfile, dictionary
-
-
-
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 #-#-# MODELING  FUNCTIONS #-#-#
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
-
 
 
 # TFIDF transform and run an SVM on a text
@@ -413,12 +392,6 @@ def run_svm(docs, labels):
     results = pd.DataFrame({"coef":coef,"word":feature_names})
 
     return results, svm, tfidf_vec
-
-
-
-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
-#-#-# PULLING  PROFILES #-#-#
-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 
 
 

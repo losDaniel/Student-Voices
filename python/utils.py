@@ -1,50 +1,15 @@
-# -*- coding: utf-8 -*-
-"""
-@author: Carlos Valcarcel
-
-A collection of various utility functions.
-"""
-
 import bz2
 import _pickle as cPickle
 import pickle 
-import requests 
-try:
-    from bs4 import BeautifulSoup
-except:
-    import pip
-    pip.main(['install', 'bs4'])    
-
 
 def chunks(l,n):
     '''Break list l up into chunks of size n'''    
     for i in range(0, len(l), n):
         yield l[i:i+n]  
 
-
 def chunkify(a, n):
     k, m = divmod(len(a), n)
     return (a[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(n))
-
-
-def get_soup(url): 
-    '''Returns the page source of desired url as a beautiful soup element.
-    This will attempt to retrieve the url 100 times before giving up.
-    
-    - url: the page url that you want to scrape
-    '''
-    check = False 
-    attempts = 0 
-    while check == False and attempts < 100:        
-        try:
-            # get most recent standings if date not specified
-            s = requests.get(url).content
-            check = True
-        except:
-            attempts += 1 
-    #Return the url page source 
-    return BeautifulSoup(s, "html.parser")
-
 
 def order(frame, var):
     '''Brings the variables supplied to the front of the dataframe. 
@@ -58,7 +23,6 @@ def order(frame, var):
     frame = frame[var+varlist]
     return frame   
 
-
 def full_pickle(title, data):
     '''pickles the submited data and titles it
     '''
@@ -66,7 +30,6 @@ def full_pickle(title, data):
     pickle.dump(data, pikd)
     pikd.close()   
     
-
 def loosen(file):
     '''loads and returns a pickled objects
     '''
@@ -75,22 +38,22 @@ def loosen(file):
     pikd.close()
     return data   
 
-
 def compressed_pickle(title, data):
     '''
-    title - title of the file you want to save (will be saved with .pbz2 extension automatically)
-    data - object you want to save 
+    Pickle a file and then compress it into a file with extension .pbz2
+    __________
+    parameters
+    - title : title of the file you want to save (will be saved with .pbz2 extension automatically)
+    - data : object you want to save 
     '''
     with bz2.BZ2File(title + '.pbz2', 'w') as f: 
         cPickle.dump(data, f)
-
 
 def decompress_pickle(filename):
     '''filename - file name including .pbz2 extension'''
     data = bz2.BZ2File(filename, 'rb')
     data = cPickle.load(data)
     return data
-
 
 def rename(data, oldnames, newname): 
     if type(oldnames) == str:
@@ -113,9 +76,24 @@ def rename(data, oldnames, newname):
         i += 1 
     return data    
 
-
 def firstrow_header(df):
     new_header = df.iloc[0] #grab the first row for the header
     df = df[1:] #take the data less the header row
     df.columns = new_header #set the header row as the df header
     return df
+
+
+class notes:
+    def init(self,file):
+        self.file = file 
+
+    def write(self, text):
+        if os.path.exists(self.file):
+            with open(self.file, 'a') as f: 
+                f.write(text+'\n')
+                f.close() 
+        else:
+            with open(self.file,'w') as f: 
+                f.write(text+'\n')
+                f.close()
+

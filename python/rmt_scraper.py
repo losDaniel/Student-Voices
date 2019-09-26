@@ -13,6 +13,8 @@ import multiprocessing
 from multiprocessing.dummy import Pool as ThreadPool 
 import bear_necessities as bn
 
+# Change the directory to the home directory. 
+os.chdir('..')
 
 class rmt_scraper:
     

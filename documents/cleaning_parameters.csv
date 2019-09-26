@@ -1,13 +1,10 @@
 ,A1,B1,C1,E1
-duration,6930.111,3096.355,6650.566765,6146.227561
 gram,4,,,5
-lemmatizer,TRUE,FALSE,TRUE,TRUE
-length_post,4863978,4863978,4863978,4863978
-length_prior,4863978,4863978,4863978,4863978
+lemmatizer,True,False,True,True
 no_not,,,,"['not', 'off', 'on']"
 pthresh,50,50,50,50
-remove_contractions,TRUE,TRUE,TRUE,TRUE
-remove_stops,TRUE,FALSE,FALSE,TRUE
+remove_contractions,True,True,True,True
+remove_stops,True,False,False,True
 repeated_removal,2,,,2
-spell_check,FALSE,FALSE,FALSE,FALSE
-stemmer,TRUE,FALSE,TRUE,FALSE
+spell_check,False,False,False,False
+stemmer,True,False,True,False

@@ -18,6 +18,41 @@ To analyze these reviews we experimented using LDA models available through the 
 
 ![LDA Topic Visualization](distance_map.png)
 
+## Replication
+
+### Hardware 
+
+The analysis was run on AWS spot instances using `spot_connect.py` and `interactive.py`. 
+
+BASH SCRIPT TO RUN THE SCRIPTS IN ORDER FROM THE COMMAND LINE 
+
+In-line with current [benchmarks of the Gensim library](https://rare-technologies.com/gensim-word2vec-on-cpu-faster-than-word2veckeras-on-gpu-incubator-student-blog/) we used CPUs instead of GPUs, and different instance types for the cleaning and analysis parts. 
+
+INSTANCE TYPES USED FOR THE CLEANING
+
+INSTANCE TYPES USED FOR THE ANALYSIS
+
+
+CREATE A MONITOR INSTANCE with the DEFAULT profile to check on everything. 
+
+
+### Commands 
+
+*This will launch a spot instance, setup the EFS and mount and create the folder structure to replicate the git directory:*
+`python spot_connect.py -n reviewdata -p default -s setup.sh`
+
+*This will reconnect to the instance you created an upload the scripts we need for the analysis to the correct directory:*
+`python spot_connect.py -n reviewdata -p default -u python/analysis_a2_clean_data.py,python/analysis_b3_lda_modeling.py,python/lda_analysis.py,python/lda_analysis.py,python/lm_analysis.py,python/modeling_tools.py,python/rmt_scraper.py,python/utils.py,python/visuals.py -r efs/python/`
+
+*This will reconnect to the instance and upload the data we need for the analysis:*
+`python spot_connect.py -n reviewdata -p default -u data/full_review_text.pbz2,data/review_stats.pbz2,data/stop_words.txt,data/contractions.pickle`
+
+**The reviewdata instance is now running on the cheapest possible instance. You may keep it active to use with an active shell to check on the EFS or terminate it using the `-t` option in `spot_connect.py`**
+
+*Using the "cleaning1" profiles in `spot_connect.py` we run the data cleaning script:*
+
+
+
 ## The Scraper 
 
 **Source Update:** The scraper was designed to work on the website RateMyTeacher.com when its terms of use and formatting allowed for collection of their public data. As of the summer of 2019 the website underwent a redesign which has rendered much (if not all) of the text in the reviews inaccessible. Thus, this scraper does not work on the current version of the website. Nevertheless, we continue to make the database compiled through our original scrape available for use in analysis. This contains the millions of reviews submitted over the span of more than a decade in six english speaking countries around the world.

@@ -5,25 +5,41 @@
 Methods to help process and visualize analysis results 
 """
 from IPython.display import display_html
-from IPython.core.display import display
 import pandas as pd
 import os
-import pyLDAvis
-import pyLDAvis.gensim
+import re 
 import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-import gzip
+import random 
 from sklearn.decomposition import PCA
-from seaborn import color_palette,palplot
-from matplotlib import pyplot as plt
+
+try:
+    import pyLDAvis
+except:
+    pip._internal.main(['install', 'pyLDAvis'])
+    import pyLDAvis
+import pyLDAvis.gensim
+try:
+    import matplotlib.pyplot as plt
+except:
+    pip._internal.main(['install', 'matplotlib'])
+    import matplotlib.pyplot as plt
 import matplotlib as mpl
 import matplotlib.patches as mpatches
-import random 
-from pyvis.network import Network
-import re 
 
+try:
+    import seaborn as sns
+except:
+    pip._internal.main(['install', 'seaborn'])
+    import seaborn as sns
 
+try:
+    from pyvis.network import Network
+except:
+    pip._internal.main(['install', 'seaborn'])
+    from pyvis.network import Network
+
+# Change the directory to the home directory. 
+os.chdir('..')
 
 # Function to describe the topics 
 def get_topic_reviews(topic, reviews, poolsize =50, samplesize = 20, fsize = (8,8)):
