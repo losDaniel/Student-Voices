@@ -56,8 +56,11 @@ except:
 cpu_count = multiprocessing.cpu_count()
 
 # Change the directory to the home directory. 
+print(os.getcwd())
 os.chdir('..')
+print(os.getcwd())
 os.chdir('..')
+print(os.getcwd())
 
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 #-# 1. TEXT CLEANING METHODS  #-#-#-#-#-#
@@ -93,8 +96,6 @@ def clean_docs(docs, # list of text documents (not tokenized)
                spell_check = False # set to True if you want to use TextBlob to correct misspellings
                ): 
     '''Clean the documents and return the cleaned documents, a map of stemmed words, and a map of phrases their frequency.'''
-        
-    notebook = bn.notes("output.txt")
         
     # instantiate a tokenizer 
     tokenizer = RegexpTokenizer(r'\w+')
