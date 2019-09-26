@@ -1,37 +1,14 @@
 pip install --upgrade pip 
 pip install TextBlob
 cd efs
-mkdir clean_A1
-mkdir clean_A2
-mkdir clean_A3
-cd clean_A1
+mkdir scripts
+cd scripts
 git init
 git config core.sparsecheckout true
-echo python/** >> .git/info/sparse-checkout
+echo scripts/ >> .git/info/sparse-checkout
 git remote add -f origin https://github.com/losDaniel/Student-Voices.git
 git checkout cleaning_script
 git pull origin
-cd python 
-python nohup analysis_a2_clean_data.py -c A1 &
-cd .. 
-cd .. 
-cd clean_B1
-git init
-git config core.sparsecheckout true
-echo python/** >> .git/info/sparse-checkout
-git remote add -f origin https://github.com/losDaniel/Student-Voices.git
-git checkout cleaning_script
-git pull origin
-cd python 
-python nohup analysis_a2_clean_data.py -c B1 &
-cd .. 
-cd .. 
-cd clean_C1
-git init
-git config core.sparsecheckout true
-echo python/** >> .git/info/sparse-checkout
-git remote add -f origin https://github.com/losDaniel/Student-Voices.git
-git checkout cleaning_script
-git pull origin
-cd python 
-python nohup analysis_a2_clean_data.py -c C1 &
+cd scripts 
+python modeling_tools.py
+nohup python analysis_a2_clean_data.py -c B1 > clean_B1.txt &

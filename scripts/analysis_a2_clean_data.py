@@ -182,18 +182,18 @@ if __name__ == '__main__':
     parser.add_argument('-c', '--configurations', help='Configuration A1,B1,C1,...', required=True)
     args = parser.parse_args()
 
-    print('Beginning in '+os.getcwd()+'\n', flush=True)
+    print('Beginning in '+os.getcwd(), flush=True)
     # if the data is not present in the data directory create the datasets from the raw data   
     if not (os.path.exists(os.getcwd()+'/data/review_stats.pbz2') and os.path.exists(os.getcwd()+'/data/full_review_text.pbz2')):
-        print("Generating data..."+'\n', flush=True)
+        print("Generating data...", flush=True)
         gen_data()
 
     if not os.path.exists(os.getcwd()+'/data/cleaned_data/'):
-        print("Cleaned data directory not detected. Creating..."+'\n', flush=True)
+        print("Cleaned data directory not detected. Creating...", flush=True)
         os.mkdir('data/cleaned_data/')
 
     if not os.path.exists(os.getcwd()+'/data/by_rating_range.pbz2'):
-        print('File "by_rating_range.pbz2" not detected. Creating...'+'\n', flush=True)
+        print('File "by_rating_range.pbz2" not detected. Creating...', flush=True)
         data = bn.decompress_pickle(os.getcwd()+'/data/review_stats.pbz2')
         # create a dictionary with the indices for each range
         create_ratings_bins(data)
@@ -202,7 +202,7 @@ if __name__ == '__main__':
     if not os.path.exists(os.getcwd()+'/results/cleaning_parameters.csv'):
         data_configurations = data_configuration_hardcodes()
     else: 
-        print('"cleaning_parameters.csv" detected. Loading...'+'\n', flush=True)
+        print('"cleaning_parameters.csv" detected. Loading...', flush=True)
         data_configurations = pd.read_csv(os.getcwd()+'/results/cleaning_parameters.csv')
         data_configurations = data_configurations.set_index('Unnamed: 0').to_dict()
 
@@ -212,23 +212,23 @@ if __name__ == '__main__':
     for config in configurations: 
         if not os.path.exists(os.getcwd()+'/data/cleaned_data/cleaned_docs_'+config+'.pbz2'):
             to_clean.append(config)
-    print('Conifgurations: '+', '.join([c for c in to_clean])+'\n', flush=True)
+    print('Conifgurations: '+', '.join([c for c in to_clean]), flush=True)
 
     # we load the full corpus of review texts everytime we loop through a configuration 
     if len(to_clean)>0:
-        print('Loading "full_review_text.pbz2"'+'\n', flush=True)
+        print('Loading "full_review_text.pbz2"', flush=True)
         text = bn.decompress_pickle(os.getcwd() + '/data/full_review_text.pbz2')
 
     # proceed with the ordinary cleaning steps
     for config in to_clean:
-        print('Cleaning '+str(config)+'\n', flush=True)
+        print('Cleaning '+str(config), flush=True)
         data_configurations = clean_data(config, text, data_configurations)
 
     if not os.path.exists(os.getcwd()+'/data/results/'):
-        print('Results folder not detected. Creating...'+'\n', flush=True)
+        print('Results folder not detected. Creating...', flush=True)
         os.mkdir(os.getcwd()+'/data/results/')
 
     # record the cleaning process       
     experimental_setup = pd.DataFrame(data_configurations)
     experimental_setup.to_csv(os.getcwd()+'/results/cleaning_parameters.csv')       
-    print('Results summary saved to "cleaning_paramters.csv"'+'\n', flush=True)
+    print('Results summary saved to "cleaning_paramters.csv"', flush=True)

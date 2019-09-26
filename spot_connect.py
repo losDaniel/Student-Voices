@@ -523,44 +523,48 @@ if __name__ == '__main__':                                                     #
         terminate_instance(instance['InstanceId'])                             # termination overrrides everything else 
         print('Script %s has been terminated' % str(args.name))
     else: 
-        try: 
-            if profile['efs_mount']: 
-                print('Profile requesting EFS mount...')
-                if args.filesystem=='':                                            # If no filesystem name is submitted 
-                    fs_name = args.name                                            # Retrieve or create a filesystem with the same name as the instance 
-                else: 
-                    fs_name = args.filesystem                                          
-                try:                                                               # Create and/or mount an EFS to the instance 
-                    mount_target, instance_dns, filesystem_dns = retrieve_efs_mount(fs_name, instance, new_mount=args.newmount)
-                except Exception as e: 
-                    raise e 
-                    sys.exit(1)        
-                print('Connecting to instance to link EFS...')
-                run_script(instance, profile['username'], 'efs_mount.sh')
-                    
-            st = time.time() 
-        
-            if args.upload!='':        
-                files_to_upload = [] 
-                for file in args.upload.split(','):
-                    files_to_upload.append(os.path.abspath(file))
-                upload_to_ec2(instance, profile['username'], files_to_upload, remote_dir=args.remotepath)    
-        
-            print('Time to Upload: %s' % str(time.time()-st))
+        if profile['efs_mount']: 
+            print('Profile requesting EFS mount...')
+            if args.filesystem=='':                                            # If no filesystem name is submitted 
+                fs_name = args.name                                            # Retrieve or create a filesystem with the same name as the instance 
+            else: 
+                fs_name = args.filesystem                                          
+            try:                                                               # Create and/or mount an EFS to the instance 
+                mount_target, instance_dns, filesystem_dns = retrieve_efs_mount(fs_name, instance, new_mount=args.newmount)
+            except Exception as e: 
+                raise e 
+                sys.exit(1)        
+            print('Connecting to instance to link EFS...')
+            run_script(instance, profile['username'], 'efs_mount.sh')
+                
+        st = time.time() 
+    
+        if args.upload!='':        
+            files_to_upload = [] 
+            for file in args.upload.split(','):
+                files_to_upload.append(os.path.abspath(file))
+            upload_to_ec2(instance, profile['username'], files_to_upload, remote_dir=args.remotepath)    
+    
+        print('Time to Upload: %s' % str(time.time()-st))
 
-            st = time.time() 
-            
-            scripts_to_run = []
-            if args.script!= '': 
-                for s in args.script.split(','):
-                    scripts_to_run.append(s)
+        st = time.time() 
+        
+        scripts_to_run = []
+        if args.script!= '': 
+            for s in args.script.split(','):
+                scripts_to_run.append(s)
 
-            for script in profile['scripts']:
-                print('\nExecuting script "%s"...' % str(script))
+        for script in profile['scripts'] + scripts_to_run:
+            print('\nExecuting script "%s"...' % str(script))
+            try:
                 if not run_script(instance, profile['username'], script):
                     break
+            except Exception as e: 
+                print(str(e))
+                print('Script %s failed with above error' % script)
+    
+        print('Time to Run Scripts: %s' % str(time.time()-st))
         
-            print('Time to Run Scripts: %s' % str(time.time()-st))
-            
-            if args.activeprompt:
-                active_shell(instance, profile['username'])
+        if args.activeprompt:
+            active_shell(instance, profile['username'])
+

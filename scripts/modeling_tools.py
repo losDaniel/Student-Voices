@@ -151,7 +151,7 @@ def clean_docs(docs, # list of text documents (not tokenized)
     tokenizer = RegexpTokenizer(r'\w+')
     st = time.time()
     pt = time.time()
-    print('Begnning Doc-wise Cleaning...'+'\n', flush=True)
+    print('Begnning Doc-wise Cleaning...', flush=True)
     for idx in range(0,len(docs)):
         # remove unicode spacing characters 
         docs[idx] = docs[idx].replace('\r',' ')
@@ -183,18 +183,18 @@ def clean_docs(docs, # list of text documents (not tokenized)
         # split into words 
         docs[idx] = tokenizer.tokenize(docs[idx])  
         if np.mod(idx,10000)==0:
-            print(str((idx/len(docs))*100)+'%'+' Time: '+str(time.time()-st)+' Rate: '+str((time.time()-pt))+'\n', flush=True)
+            print(str((idx/len(docs))*100)+'%'+' Time: '+str(time.time()-st)+' Rate: '+str((time.time()-pt)), flush=True)
             pt = time.time()
 
-    print('Basic Cleaning: Complete'+'\n', flush=True) 
+    print('Basic Cleaning: Complete', flush=True) 
     
     # Remove numbers, but not words that contain numbers. for the rmt corpus this is very useful in separating "grade" from "10th grade", "9th grade", ... which have very different meanings
     docs = [[token for token in doc if not token.isnumeric()] for doc in docs]
-    print('Filtering Out Numerics: Complete'+'\n', flush=True)
+    print('Filtering Out Numerics: Complete', flush=True)
 
     # Remove words that are only one character. 
     docs = [[token for token in doc if len(token) > 1] for doc in docs] 
-    print('Remove One Character Words: Complete'+'\n', flush=True)
+    print('Remove One Character Words: Complete', flush=True)
     
     # remove stop words 
     if remove_stops: 
@@ -207,7 +207,7 @@ def clean_docs(docs, # list of text documents (not tokenized)
                 except:
                     pass
         docs = [[token for token in doc if token not in stop_words] for doc in docs] 
-        print('Stop Word Removal: Complete'+'\n', flush=True)
+        print('Stop Word Removal: Complete', flush=True)
     
     # we can use the textblob module to implement spell_check and auto-corrections (this is even capable of capturing slang)
     if spell_check: 
@@ -218,18 +218,18 @@ def clean_docs(docs, # list of text documents (not tokenized)
                     corrections[token] = str(TextBlob(token).correct()) 
         # when textblob fails to recognize a word it returns the same word
         docs = [[corrections[token] for token in doc] for doc in docs]            
-        print('Spell Check: Complete'+'\n', flush=True)
+        print('Spell Check: Complete', flush=True)
     
     # we're going to stem the words but create a map so we can trace the words back. We do so by using the populate stems function defined above 
     lemma_map = {}
     if lemmatizer: 
         docs = [[populate_stems(token, lemma_map, stemmer = WordNetLemmatizer()) for token in doc] for doc in docs]
-        print('Lemmatization: Complete'+'\n', flush=True)
+        print('Lemmatization: Complete', flush=True)
 
     stem_map = {}
     if stemmer: 
         docs = [[populate_stems(token, stem_map, stemmer = PorterStemmer()) for token in doc] for doc in docs]
-        print('Stemming: Complete'+'\n', flush=True)
+        print('Stemming: Complete', flush=True)
         
     return docs, stem_map, lemma_map
     
