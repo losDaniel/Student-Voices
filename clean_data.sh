@@ -11,4 +11,4 @@ git checkout cleaning_script
 git pull origin
 cd scripts 
 python modeling_tools.py
-nohup python analysis_a2_clean_data.py -c B1 > clean_B1.txt &
+nohup python analysis_a2_clean_data.py -c C1 > clean_C1.txt &
