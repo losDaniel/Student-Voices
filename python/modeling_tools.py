@@ -55,11 +55,8 @@ except:
 
 cpu_count = multiprocessing.cpu_count()
 
-cdir = ''
-while cdir!="/home/ec2-user/efs":
-    os.chdir('..')
-    cdir = os.getcwd()
-
+os.chdir("/home/ec2-user/efs")
+    
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 #-# 1. TEXT CLEANING METHODS  #-#-#-#-#-#
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
