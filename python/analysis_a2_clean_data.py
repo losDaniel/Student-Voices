@@ -208,7 +208,7 @@ if __name__ == '__main__':
     for config in configurations: 
         if not os.path.exists(os.getcwd()+'/data/cleaned_data/cleaned_docs_'+config+'.pbz2'):
             to_clean.append(config)
-    sys.stdout.write('Conifgurations:', '.'.join([c for c in to_clean]))
+    sys.stdout.write('Conifgurations: '+', '.join([c for c in to_clean]))
 
     # we load the full corpus of review texts everytime we loop through a configuration 
     if len(to_clean)>0:
@@ -217,7 +217,7 @@ if __name__ == '__main__':
 
     # proceed with the ordinary cleaning steps
     for config in to_clean:
-        sys.stdout.write('Cleaning %s' % str(config))
+        sys.stdout.write('Cleaning '+str(config))
         data_configurations = clean_data(config, text, data_configurations)
 
     if not os.path.exists(os.getcwd()+'/data/results/'):

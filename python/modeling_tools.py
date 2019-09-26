@@ -95,6 +95,7 @@ def clean_docs(docs, # list of text documents (not tokenized)
     # instantiate a tokenizer 
     tokenizer = RegexpTokenizer(r'\w+')
     st = time.time()
+    pt = time.time()
     sys.stdout.write('Begnning Doc-wise Cleaning...')
     for idx in range(0,len(docs)):
         # remove unicode spacing characters 
@@ -127,7 +128,8 @@ def clean_docs(docs, # list of text documents (not tokenized)
         # split into words 
         docs[idx] = tokenizer.tokenize(docs[idx])  
         if np.mod(idx,10000)==0:
-            sys.stdout.write(str((idx/len(docs))*100),'%%','Time:',str(time.time()-st))
+            sys.stdout.write(str((idx/len(docs))*100)+'%'+' Time: '+str(time.time()-st)+' Rate: '+str((time.time()-pt)))
+            pt = time.time()
 
     sys.stdout.write('Basic Cleaning: Complete') 
     
