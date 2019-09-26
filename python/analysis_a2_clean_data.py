@@ -208,7 +208,6 @@ if __name__ == '__main__':
 
     # check the cleaned documents in the data to check which have been completed 
     configurations = args.configurations.split(',')
-    sys.stdout.write('Configurations: '+' '.join(configurations))
     to_clean = [] 
     for config in configurations: 
         if not os.path.exists(os.getcwd()+'/data/cleaned_data/cleaned_docs_'+config+'.pbz2'):
