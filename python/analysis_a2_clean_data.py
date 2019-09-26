@@ -182,7 +182,7 @@ if __name__ == '__main__':
     parser.add_argument('-c', '--configurations', help='Configuration A1,B1,C1,...', required=True)
     args = parser.parse_args()
 
-    sys.stdout.write('Beginning in '+os.getcwd()+'\n')
+    sys.stdout.write('Beginning in '+os.getcwd())
     # if the data is not present in the data directory create the datasets from the raw data   
     if not (os.path.exists(os.getcwd()+'/data/review_stats.pbz2') and os.path.exists(os.getcwd()+'/data/full_review_text.pbz2')):
         sys.stdout.write("Generating data..."+'\n')

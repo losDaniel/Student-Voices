@@ -491,7 +491,7 @@ if __name__ == '__main__':                                                     #
                         'instance_type':'c5d.large',                           # 2 VCPU Compute Optimized Instance for data cleaning                        
                         'price':'0.05',
                         'region':'us-west-2',                                  
-                        'scripts':[],                            
+                        'scripts':['setup.sh','clean_data.sh'],                            
                         'username':'ec2-user',                                 
                         'efs_mount':True                                       
                         },
@@ -501,7 +501,7 @@ if __name__ == '__main__':                                                     #
     parser = argparse.ArgumentParser(description='Launch spot instance')
     parser.add_argument('-n', '--name', help='Name of the spot instance', required=True)
     parser.add_argument('-p', '--profile', help='Profile', default=list(profiles.keys())[0], choices=profiles.keys())
-    parser.add_argument('-s', '--script', help='Script path', action='append', default=[])
+    parser.add_argument('-s', '--script', help='Script path', default='')
     parser.add_argument('-f', '--filesystem', help='Elastic File System name', default='')
     parser.add_argument('-u', '--upload', help='File or directory to upload', default='')
     parser.add_argument('-r', '--remotepath', help='Directory on EC2 instance to upload via ordinary NFS', default='.')
@@ -549,7 +549,7 @@ if __name__ == '__main__':                                                     #
 
         st = time.time() 
         
-        for script in profile['scripts'] + args.script:
+        for script in profile['scripts'] + args.script.split(','):
             print('\nExecuting script "%s"...' % str(script))
             if not run_script(instance, profile['username'], script):
                 break
