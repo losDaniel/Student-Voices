@@ -10,4 +10,6 @@ git config core.sparsecheckout true
 echo python/** >> .git/info/sparse-checkout
 git remote add -f origin https://github.com/losDaniel/Student-Voices.git
 git checkout cleaning_script
-python modeling_tools.py
+git pull origin
+#cd python 
+#python nohup analysis_a2_clean_data.py -c A1 &

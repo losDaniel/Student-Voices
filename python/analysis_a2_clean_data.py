@@ -1,4 +1,4 @@
-import os, time, sys
+import os, time, sys, argparse
 import utils as bn 
 import modeling_tools as mt 
 import pip._internal
@@ -178,6 +178,10 @@ if __name__ == '__main__':
     # Change the directory to the home directory. 
     os.chdir("/home/ec2-user/efs")
 
+    parser = argparse.ArgumentParser(description='Launch spot instance')
+    parser.add_argument('-c', '--configurations', help='Configuration A1,B1,C1,...', required=True)
+    args = parser.parse_args()
+
     sys.stdout.write('Beginning in '+os.getcwd()+'\n')
     # if the data is not present in the data directory create the datasets from the raw data   
     if not (os.path.exists(os.getcwd()+'/data/review_stats.pbz2') and os.path.exists(os.getcwd()+'/data/full_review_text.pbz2')):
@@ -207,7 +211,8 @@ if __name__ == '__main__':
     sys.stdout.write('4'+'\n')
 
     # check the cleaned documents in the data to check which have been completed 
-    configurations = ['A1','B1','C1']
+    configurations = args.configurations.split(',')
+    sys.stdout.write('Configurations: '+' '.join(configurations))
     to_clean = [] 
     for config in configurations: 
         if not os.path.exists(os.getcwd()+'/data/cleaned_data/cleaned_docs_'+config+'.pbz2'):
