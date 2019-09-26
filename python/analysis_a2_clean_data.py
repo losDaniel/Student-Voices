@@ -181,10 +181,10 @@ if __name__ == '__main__':
         os.chdir('..')
         cdir = os.getcwd()
 
-    sys.stdout.write('Beginning in '+os.getcwd())
+    sys.stdout.write('Beginning in '+os.getcwd()+'\n')
     # if the data is not present in the data directory create the datasets from the raw data   
     if not (os.path.exists(os.getcwd()+'/data/review_stats.pbz2') and os.path.exists(os.getcwd()+'/data/full_review_text.pbz2')):
-        sys.stdout.write("Generating data...")
+        sys.stdout.write("Generating data..."+'\n')
         gen_data()
 
     if not os.path.exists(os.getcwd()+'/data/cleaned_data/'):
