@@ -1,0 +1,5 @@
+Beginning in /home/ec2-user/efs
+Conifgurations: B1
+Loading "full_review_text.pbz2"
+Cleaning B1
+Begnning Doc-wise Cleaning...

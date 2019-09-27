@@ -146,10 +146,7 @@ def clean_docs(docs, # list of text documents (not tokenized)
                repeated_removal=2, # remove characters that repeat at least this number of times 
                spell_check = False # set to True if you want to use TextBlob to correct misspellings
                ): 
-    '''Clean the documents and return the cleaned documents, a map of stemmed words, and a map of phrases their frequency.'''
-        
-    # instantiate a tokenizer 
-    tokenizer = RegexpTokenizer(r'\w+')
+    '''Clean the documents and return the cleaned documents, a map of stemmed words, and a map of phrases their frequency.'''        
     st = time.time()
     pt = time.time()
     print('Begnning Doc-wise Cleaning...', flush=True)
@@ -207,6 +204,9 @@ def clean_docs(docs, # list of text documents (not tokenized)
 
 def docwise_cleaning(docs, repeated_removal=None, remove_contractions=False):
     '''Apply basic cleaning to the documents in the corpus'''
+    # instantiate a tokenizer 
+    tokenizer = RegexpTokenizer(r'\w+')
+
     for idx in range(0,len(docs)):
         try: 
             # remove unicode spacing characters 
@@ -242,7 +242,7 @@ def docwise_cleaning(docs, repeated_removal=None, remove_contractions=False):
                 print(str((idx/len(docs))*100)+'%'+' Time: '+str(time.time()-st)+' Rate: '+str((time.time()-pt)), flush=True)
                 pt = time.time()
         except Exception as e: 
-            print('IDX: ', idx, doc[idx], flush=True)
+            print('IDX: ', idx, docs[idx], flush=True)
             raise e
 
     return docs
