@@ -204,6 +204,7 @@ def docwise_cleaning(docs, repeated_removal=None, remove_contractions=False):
     '''Apply basic cleaning to the documents in the corpus'''
     # instantiate a tokenizer 
     tokenizer = RegexpTokenizer(r'\w+')
+    
     st = time.time()
     pt = time.time()
 

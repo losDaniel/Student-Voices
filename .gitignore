@@ -17,3 +17,6 @@ models/archive/LDA1_modelsV1.zip
 efs_mount.sh
 KP-*
 dev.ipynb
+clean_A1.txt
+clean_B1.txt
+clean_C1.txt
