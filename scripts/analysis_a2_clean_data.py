@@ -176,8 +176,8 @@ def clean_data(config, text, data_configurations):
 if __name__ == '__main__':
 
     # Change the directory to the home directory. 
-    #os.chdir("/home/ec2-user/efs")
-    os.chdir('C:/Users/carlo/Dropbox/Responsibilities/Student_Voices')
+    os.chdir("/home/ec2-user/efs")
+    #os.chdir('C:/Users/carlo/Dropbox/Responsibilities/Student_Voices')
 
     parser = argparse.ArgumentParser(description='Launch spot instance')
     parser.add_argument('-c', '--configurations', help='Configuration A1,B1,C1,...', required=True)
