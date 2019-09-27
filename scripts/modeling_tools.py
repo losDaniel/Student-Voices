@@ -147,8 +147,6 @@ def clean_docs(docs, # list of text documents (not tokenized)
                spell_check = False # set to True if you want to use TextBlob to correct misspellings
                ): 
     '''Clean the documents and return the cleaned documents, a map of stemmed words, and a map of phrases their frequency.'''        
-    st = time.time()
-    pt = time.time()
     print('Begnning Doc-wise Cleaning...', flush=True)
 
     # Clean each document 
@@ -206,6 +204,8 @@ def docwise_cleaning(docs, repeated_removal=None, remove_contractions=False):
     '''Apply basic cleaning to the documents in the corpus'''
     # instantiate a tokenizer 
     tokenizer = RegexpTokenizer(r'\w+')
+    st = time.time()
+    pt = time.time()
 
     for idx in range(0,len(docs)):
         try: 

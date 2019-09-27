@@ -3,3 +3,4 @@ Conifgurations: B1
 Loading "full_review_text.pbz2"
 Cleaning B1
 Begnning Doc-wise Cleaning...
+IDX:  0 ['mrs', 't', 'is', 'a', 'freaking', 'awesome', 'teacher']
