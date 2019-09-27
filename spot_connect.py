@@ -44,7 +44,7 @@ import time, os, sys, argparse, interactive
 
 
 
-def launch_spot_instance(spotid, profile, spot_wait_sleep=5, instance_wait_sleep=5, key_pair_dir=os.getcwd(), enable_nfs=True, enable_ds=True):
+def launch_spot_instance(spotid, profile, monitoring=True, spot_wait_sleep=5, instance_wait_sleep=5, key_pair_dir=os.getcwd(), enable_nfs=True, enable_ds=True):
     '''
     Launch a spot instance using the preconfigured aws account on boto3. Returns instance ID. 
     __________
@@ -163,6 +163,7 @@ def launch_spot_instance(spotid, profile, spot_wait_sleep=5, instance_wait_sleep
                 'ImageId': profile['image_id'],                                # AWS image ID. List available programatically or through launch wizard 
                 'InstanceType': profile['instance_type'],                      # Instance type. List available programatically or through wizard or at https://aws.amazon.com/ec2/spot/pricing/ 
                 'KeyName': profile['key_pair'][0],                             # Name for the key pair
+                'Monitoring' : {'Enabled': monitoring},                        # Enable monitoring
             },
             SpotPrice=profile['price'],                                        # Must be greater than current instance type price for region, available at https://aws.amazon.com/ec2/spot/pricing/ 
             Type='one-time',                                                   # Persisitence is usually not necessary (given storage backup) or advisable with spot instances 
@@ -285,7 +286,7 @@ def run_script(instance, user_name, script_file, port=22):
     client.close()                                                             # Close the connection 
     exit_code = session.recv_exit_status()
     print('Closed connection. Exit code: ' + str(exit_code))
-    return exit_code == 0
+    return True
 
 
 
@@ -488,12 +489,12 @@ if __name__ == '__main__':                                                     #
                         },
             "cleaning1":{'firewall_ingress': ('tcp', 22, 22, '0.0.0.0/0'),     
                         'image_id':'ami-0859ec69e0492368e',                    
-                        'instance_type':'c5d.large',                           # 2 VCPU Compute Optimized Instance for data cleaning                        
-                        'price':'0.05',
+                        'instance_type':'c5d.2xlarge',                         # VCPU Compute Optimized Instance for data cleaning                        
+                        'price':'0.14',
                         'region':'us-west-2',                                  
-                        'scripts':['setup.sh','clean_data.sh'],                            
+                        'scripts':[],                            
                         'username':'ec2-user',                                 
-                        'efs_mount':True                                       
+                        'efs_mount':True                                     
                         },
 #            "gateway":{'image_id':'ami-0a832317c0f4c5d01',}
     }
@@ -507,13 +508,14 @@ if __name__ == '__main__':                                                     #
     parser.add_argument('-r', '--remotepath', help='Directory on EC2 instance to upload via ordinary NFS', default='.')
     parser.add_argument('-a', '--activeprompt', help='If "True" leave an active shell open after running scripts', default=False)
     parser.add_argument('-t', '--terminate', help='Terminate a specific instance', default=False)
-    parser.add_argument('-m', '--newmount', help='Create a new mount target even if one exists', default=False)
+    parser.add_argument('-nm', '--newmount', help='Create a new mount target even if one exists', default=False)
+    parser.add_argument('-m', '--monitoring', help='Activate monitoring for the instance', default=True)
     args = parser.parse_args()
     
     profile = profiles[args.profile]
     
     try:                                                   
-        instance, profile = launch_spot_instance(args.name, profile)           # Launch or connect to the spot instance under the given name 
+        instance, profile = launch_spot_instance(args.name, profile, args.monitoring)  # Launch or connect to the spot instance under the given name 
     except Exception as e:
         raise e
         sys.exit(1)

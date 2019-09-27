@@ -153,43 +153,9 @@ def clean_docs(docs, # list of text documents (not tokenized)
     st = time.time()
     pt = time.time()
     print('Begnning Doc-wise Cleaning...', flush=True)
-    for idx in range(0,len(docs)):
-        try: 
-            # remove unicode spacing characters 
-            docs[idx] = docs[idx].replace('\r',' ')
-            docs[idx] = docs[idx].replace('\n',' ')
 
-            # convert to lower case 
-            docs[idx] = docs[idx].lower()  
-            
-            # even after isolating the text variable I end up with the values from the SubmittedBy column inserted into the text. 
-            docs[idx] = docs[idx].replace('submitted by a student','')
-            docs[idx] = docs[idx].replace('submitted by a parent','')
-
-            # remove punctuation
-            docs[idx] = docs[idx].replace("'","") # remove apostrophes 
-            docs[idx] = docs[idx].replace('[{}]'.format(string.punctuation), ' ')
-
-            if repeated_removal is not None: 
-                # replace `reapeated_removal` OR MORE repeated characters with a single instance (replace "coooool!!!!" with "col!")
-                docs[idx] = re.sub(r'(.)\1{'+str(int(repeated_removal)-1)+',}', r'\1', docs[idx])
-
-            # replace contractions (since we removed punctuation we replace versions of the contractions without apostrophes)
-            if remove_contractions:
-                for c in contractions: 
-                    docs[idx] = re.sub("(?<![a-zA-Z])"+c.replace("'","")+"(?![a-zA-Z])",contractions[c], docs[idx])
-
-            # replace some common typos in this corpus 
-            docs[idx] = re.sub('foward','forward', docs[idx])
-            docs[idx] = re.sub('yrs','years', docs[idx])
-            # split into words 
-            docs[idx] = tokenizer.tokenize(docs[idx])  
-            if np.mod(idx,10000)==0:
-                print(str((idx/len(docs))*100)+'%'+' Time: '+str(time.time()-st)+' Rate: '+str((time.time()-pt)), flush=True)
-                pt = time.time()
-        except Exception as e: 
-            print('IDX: ', idx, doc[idx])
-            raise e
+    # Clean each document 
+    docs = docwise_cleaning(docs, repeated_removal=repeated_removal, remove_contractions=remove_contractions)
 
     print('Basic Cleaning: Complete', flush=True) 
     
@@ -238,6 +204,49 @@ def clean_docs(docs, # list of text documents (not tokenized)
         
     return docs, stem_map, lemma_map
     
+
+def docwise_cleaning(docs, repeated_removal=None, remove_contractions=False):
+    '''Apply basic cleaning to the documents in the corpus'''
+    for idx in range(0,len(docs)):
+        try: 
+            # remove unicode spacing characters 
+            docs[idx] = docs[idx].replace('\r',' ')
+            docs[idx] = docs[idx].replace('\n',' ')
+
+            # convert to lower case 
+            docs[idx] = docs[idx].lower()  
+            
+            # even after isolating the text variable I end up with the values from the SubmittedBy column inserted into the text. 
+            docs[idx] = docs[idx].replace('submitted by a student','')
+            docs[idx] = docs[idx].replace('submitted by a parent','')
+
+            # remove punctuation
+            docs[idx] = docs[idx].replace("'","") # remove apostrophes 
+            docs[idx] = docs[idx].replace('[{}]'.format(string.punctuation), ' ')
+
+            if repeated_removal is not None: 
+                # replace `reapeated_removal` OR MORE repeated characters with a single instance (replace "coooool!!!!" with "col!")
+                docs[idx] = re.sub(r'(.)\1{'+str(int(repeated_removal)-1)+',}', r'\1', docs[idx])
+
+            # replace contractions (since we removed punctuation we replace versions of the contractions without apostrophes)
+            if remove_contractions:
+                for c in contractions: 
+                    docs[idx] = re.sub("(?<![a-zA-Z])"+c.replace("'","")+"(?![a-zA-Z])",contractions[c], docs[idx])
+
+            # replace some common typos in this corpus 
+            docs[idx] = re.sub('foward','forward', docs[idx])
+            docs[idx] = re.sub('yrs','years', docs[idx])
+            # split into words 
+            docs[idx] = tokenizer.tokenize(docs[idx])  
+            if np.mod(idx,10000)==0:
+                print(str((idx/len(docs))*100)+'%'+' Time: '+str(time.time()-st)+' Rate: '+str((time.time()-pt)), flush=True)
+                pt = time.time()
+        except Exception as e: 
+            print('IDX: ', idx, doc[idx], flush=True)
+            raise e
+
+    return docs
+
 
 # Creating and indexing stems or lemmatizations 
 def populate_stems(word, # the word you want to stem or lemmatize
