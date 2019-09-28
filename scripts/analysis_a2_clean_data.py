@@ -158,6 +158,9 @@ def clean_data(config, text, data_configurations):
                             pthresh=data_configurations[config]['pthresh'],
                             spell_check=data_configurations[config]['spell_check'])
 
+    bn.compressed_pickle(os.getcwd() + '/data/cleaned_data/cleaned_docs_'+str(config), cleaned)
+    print('cleaned_docs_'+str(config)+' has been saved...', flush=True)
+
     # track corpus length 
     cl2 = len(cleaned[0])
     # record the corpus lengths
@@ -167,9 +170,6 @@ def clean_data(config, text, data_configurations):
     # record the duration of the cleaning process
     data_configurations[config]['duration'] = time.time()-st
         
-    bn.compressed_pickle(os.getcwd() + '/data/cleaned_data/cleaned_docs_'+str(config), cleaned)
-    print('cleaned_docs_'+str(config)+' has been saved...')
-
     return data_configurations
 
 
