@@ -515,6 +515,10 @@ if __name__ == '__main__':                                                     #
     
     profile = profiles[args.profile]
     
+    print('#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#')
+    print('#~#~#~#~#~#~#~# Launching '+args.name)
+    print('#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#')
+
     try:                                                   
         instance, profile = launch_spot_instance(args.name, profile, args.monitoring)  # Launch or connect to the spot instance under the given name 
     except Exception as e:
