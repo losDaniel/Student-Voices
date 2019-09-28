@@ -1,8 +1,17 @@
-# Run from the Home directory
-# Launch an instance  
-python spot_connect.py -n dta_clean_A1 -p cleaning1 -f reviewdata -s setup.sh
-python spot_connect.py -n dta_clean_A1 -p cleaning1 -f reviewdata -s cleandata_A1.sh -t True
-#python spot_connect.py -n cleanB1 -p cleaning1 -f reviewdata -s setup.sh
-#python spot_connect.py -n cleanB1 -p cleaning1 -f reviewdata -s cleandata_B1.sh
-python spot_connect.py -n dta_clean_C1 -p cleaning1 -f reviewdata -s setup.sh
-python spot_connect.py -n dta_clean_C1 -p cleaning1 -f reviewdata -s cleandata_C1.shomm -t True 
+#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#
+# Launch Instances to clean the data 
+#~#~#~#~#~#~#~#~#~#~
+
+# Launch an instance that connects to the reviewdata EFS drive and runs the cleaning scripts:
+
+# Cleaning Instance for A1 Config
+python spot_connect.py -n dtac_A1 -p cleaning1 -f reviewdata -s scripts/cleansetup.sh
+python spot_connect.py -n dtac_A1 -p cleaning1 -f reviewdata -s scripts/cleandata_A1.sh
+
+# Cleaning Instance for B1 Config 
+#python spot_connect.py -n dtac_B1 -p cleaning1 -f reviewdata -s scripts/cleansetup.sh
+#python spot_connect.py -n dtac_B1 -p cleaning1 -f reviewdata -s scripts/cleandata_A1.sh
+
+# Cleaning Instance for C1 Config 
+python spot_connect.py -n dtac_C1 -p cleaning1 -f reviewdata -s scripts/cleansetup.sh
+python spot_connect.py -n dtac_C1 -p cleaning1 -f reviewdata -s scripts/cleandata_C1.sh

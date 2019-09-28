@@ -1,9 +1,5 @@
-# To be run within an instance 
-# Run the data cleaning: 
-# -- create the directories you need 
-# -- pull scripts directory from github 
-# -- run data cleaning 
-
+pip install --upgrade pip 
+pip install TextBlob
 cd efs
 mkdir scripts
 cd scripts

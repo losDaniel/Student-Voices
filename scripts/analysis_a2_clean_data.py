@@ -168,6 +168,7 @@ def clean_data(config, text, data_configurations):
     data_configurations[config]['duration'] = time.time()-st
         
     bn.compressed_pickle(os.getcwd() + '/data/cleaned_data/cleaned_docs_'+str(config), cleaned)
+    print('cleaned_docs_'+str(config)+' has been saved...')
 
     return data_configurations
 

@@ -307,7 +307,10 @@ def active_shell(instance, user_name, port=22):
     session = console.get_transport().open_session()
     session.get_pty()
     session.invoke_shell()
-    interactive.interactive_shell(session)
+    try:
+        interactive.interactive_shell(session)
+    except: 
+        print('Logged out of interactive session.')
     session.close() 
     return True 
 

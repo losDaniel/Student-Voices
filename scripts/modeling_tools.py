@@ -153,9 +153,9 @@ def clean_docs(docs, # list of text documents (not tokenized)
     docs = docwise_cleaning(docs, repeated_removal=repeated_removal, remove_contractions=remove_contractions)
 
     print('Basic Cleaning: Complete', flush=True) 
-    
+   
     # Remove numbers, but not words that contain numbers. for the rmt corpus this is very useful in separating "grade" from "10th grade", "9th grade", ... which have very different meanings
-    docs = [[token for token in doc if not token.isnumeric()] for doc in docs]
+    docs = rnumeric(docs)
     print('Filtering Out Numerics: Complete', flush=True)
 
     # Remove words that are only one character. 
@@ -239,7 +239,7 @@ def docwise_cleaning(docs, repeated_removal=None, remove_contractions=False):
             docs[idx] = re.sub('yrs','years', docs[idx])
             # split into words 
             docs[idx] = tokenizer.tokenize(docs[idx])  
-            if np.mod(idx,10000)==0:
+            if np.mod(idx,100000)==0:
                 print(str((idx/len(docs))*100)+'%'+' Time: '+str(time.time()-st)+' Rate: '+str((time.time()-pt)), flush=True)
                 pt = time.time()
         except Exception as e: 
@@ -247,6 +247,23 @@ def docwise_cleaning(docs, repeated_removal=None, remove_contractions=False):
             raise e
 
     return docs
+
+
+
+def rnumeric(docs):
+    '''Remove stand alone numeric characters'''
+    st = time.time()
+    pt = time.time()
+    out = [] 
+    for idx, doc in enumerate(docs): 
+        if np.mod(idx,500000)==0:
+            print(str((idx/len(docs))*100)+'%'+' Time: '+str(time.time()-st)+' Rate: '+str((time.time()-pt)), flush=True)
+            pt = time.time()
+        for token in doc:
+            if not token.isnumeric():
+                out.append(token)
+    return out 
+
 
 
 # Creating and indexing stems or lemmatizations 
@@ -298,6 +315,7 @@ def find_phrases(docs, phrase_thresh = 40, gram = 2):
         raise Exception("That don't make no sense, gram should be > 2")
     # we start with bigrams
     g = 2 
+    st = time.time()
     while g <= gram:     
         phrases = Phrases(docs, min_count=phrase_thresh)  # train model 
         for phrase, score in phrases.export_phrases(docs): 
@@ -306,6 +324,7 @@ def find_phrases(docs, phrase_thresh = 40, gram = 2):
         phrases = Phraser(phrases) 
         docs = [phrases[doc] for doc in docs] 
         # once we've embedded the bigrams in the docs we go for trigrams and so on 
+        print('Finished searching for grams '+str(g)+' after '+str(time.time()-st))
         g += 1 
 
     return docs, phrase_voc

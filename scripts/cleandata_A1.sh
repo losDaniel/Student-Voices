@@ -1,9 +1,5 @@
-# To be run within an instance 
-# Run the data cleaning: 
-# -- create the directories you need 
-# -- pull scripts directory from github 
-# -- run data cleaning 
-
+pip install --upgrade pip 
+pip install TextBlob
 cd efs
 mkdir scripts
 cd scripts
@@ -15,4 +11,4 @@ git checkout cleaning_script
 git pull origin
 cd scripts 
 python modeling_tools.py
-nohup python analysis_a2_clean_data.py -c C1 > clean_C1.txt &
+nohup python analysis_a2_clean_data.py -c A1 > clean_A1.txt &
