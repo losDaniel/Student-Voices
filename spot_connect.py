@@ -167,6 +167,7 @@ def launch_spot_instance(spotid, profile, monitoring=True, spot_wait_sleep=5, in
             },
             SpotPrice=profile['price'],                                        # Must be greater than current instance type price for region, available at https://aws.amazon.com/ec2/spot/pricing/ 
             Type='one-time',                                                   # Persisitence is usually not necessary (given storage backup) or advisable with spot instances 
+            InstanceInterruptionBehavior='terminate',                          # Instance terminates if typing `shutdown -h now` in the console
         )
         spot_req_id = response['SpotInstanceRequests'][0]['SpotInstanceRequestId']
     # check if the instance id has been created (if the instance has been created)

@@ -55,8 +55,8 @@ except:
 
 cpu_count = multiprocessing.cpu_count()
 
+# rootpath for the AWS directory 
 os.chdir("/home/ec2-user/efs")
-#os.chdir('C:/Users/carlo/Dropbox/Responsibilities/Student_Voices')
     
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 #-# 1. TEXT CLEANING METHODS  #-#-#-#-#-#
