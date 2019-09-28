@@ -192,7 +192,7 @@ def launch_spot_instance(spotid, profile, monitoring=True, spot_wait_sleep=5, in
                 time.sleep(spot_wait_sleep)
         else: 
             if attempt==0:
-                print('Launching...')
+                print('>>Launching...')
             sys.stdout.write(".")
             sys.stdout.flush()                                                 # If a new spot request was submitted it may take a moment to register
             time.sleep(spot_wait_sleep)                                        # Wait and attempt to connect again 
@@ -216,12 +216,12 @@ def launch_spot_instance(spotid, profile, monitoring=True, spot_wait_sleep=5, in
             instance_up=True        
         else:
             if attempt==0:
-                print('Waiting for instance to boot')    
+                print('>>Waiting for instance to boot')    
             time.sleep(instance_wait_sleep)
             attempt+=1 
     if instance_status!='ok':                                                  # Wait until the instance is runing to connect 
         raise Exception('Failed to boot, instance status: %s' % str(instance_status))
-    print('Online')
+    print('>>Online')
 
     return instance, profile                                                   # Return the instance and profile in case a key and security group were added to the profile 
 
@@ -508,70 +508,68 @@ if __name__ == '__main__':                                                     #
     parser.add_argument('-u', '--upload', help='File or directory to upload', default='')
     parser.add_argument('-r', '--remotepath', help='Directory on EC2 instance to upload via ordinary NFS', default='.')
     parser.add_argument('-a', '--activeprompt', help='If "True" leave an active shell open after running scripts', default=False)
-    parser.add_argument('-t', '--terminate', help='Terminate a specific instance', default=False)
+    parser.add_argument('-t', '--terminate', help='Terminate the instance after running everything', default=False)
     parser.add_argument('-nm', '--newmount', help='Create a new mount target even if one exists', default=False)
     parser.add_argument('-m', '--monitoring', help='Activate monitoring for the instance', default=True)
     args = parser.parse_args()
     
     profile = profiles[args.profile]
-    
-    print('#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#')
-    print('#~#~#~#~#~#~#~# Launching '+args.name)
-    print('#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#')
-
+    print('', flush=True)
+    print('#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#', flush=True)
+    print('#~#~#~#~#~#~#~# Launching '+args.name, flush=True)
+    print('#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#', flush=True)
+    print('', flush=True)
     try:                                                   
         instance, profile = launch_spot_instance(args.name, profile, args.monitoring)  # Launch or connect to the spot instance under the given name 
     except Exception as e:
         raise e
         sys.exit(1)
 
+    if profile['efs_mount']: 
+        print('Profile requesting EFS mount...')
+        if args.filesystem=='':                                            # If no filesystem name is submitted 
+            fs_name = args.name                                            # Retrieve or create a filesystem with the same name as the instance 
+        else: 
+            fs_name = args.filesystem                                          
+        try:                                                               # Create and/or mount an EFS to the instance 
+            mount_target, instance_dns, filesystem_dns = retrieve_efs_mount(fs_name, instance, new_mount=args.newmount)
+        except Exception as e: 
+            raise e 
+            sys.exit(1)        
+        print('Connecting to instance to link EFS...')
+        run_script(instance, profile['username'], 'efs_mount.sh')
+            
+    st = time.time() 
+
+    if args.upload!='':        
+        files_to_upload = [] 
+        for file in args.upload.split(','):
+            files_to_upload.append(os.path.abspath(file))
+        upload_to_ec2(instance, profile['username'], files_to_upload, remote_dir=args.remotepath)    
+
+    print('Time to Upload: %s' % str(time.time()-st))
+
+    st = time.time() 
+    
+    scripts_to_run = []
+    if args.script!= '': 
+        for s in args.script.split(','):
+            scripts_to_run.append(s)
+
+    for script in profile['scripts'] + scripts_to_run:
+        print('\nExecuting script "%s"...' % str(script))
+        try:
+            if not run_script(instance, profile['username'], script):
+                break
+        except Exception as e: 
+            print(str(e))
+            print('Script %s failed with above error' % script)
+
+    print('Time to Run Scripts: %s' % str(time.time()-st))
+    
+    if args.activeprompt:
+        active_shell(instance, profile['username'])
 
     if args.terminate:                                                         # If we want to terminate the instance 
         terminate_instance(instance['InstanceId'])                             # termination overrrides everything else 
         print('Script %s has been terminated' % str(args.name))
-    else: 
-        if profile['efs_mount']: 
-            print('Profile requesting EFS mount...')
-            if args.filesystem=='':                                            # If no filesystem name is submitted 
-                fs_name = args.name                                            # Retrieve or create a filesystem with the same name as the instance 
-            else: 
-                fs_name = args.filesystem                                          
-            try:                                                               # Create and/or mount an EFS to the instance 
-                mount_target, instance_dns, filesystem_dns = retrieve_efs_mount(fs_name, instance, new_mount=args.newmount)
-            except Exception as e: 
-                raise e 
-                sys.exit(1)        
-            print('Connecting to instance to link EFS...')
-            run_script(instance, profile['username'], 'efs_mount.sh')
-                
-        st = time.time() 
-    
-        if args.upload!='':        
-            files_to_upload = [] 
-            for file in args.upload.split(','):
-                files_to_upload.append(os.path.abspath(file))
-            upload_to_ec2(instance, profile['username'], files_to_upload, remote_dir=args.remotepath)    
-    
-        print('Time to Upload: %s' % str(time.time()-st))
-
-        st = time.time() 
-        
-        scripts_to_run = []
-        if args.script!= '': 
-            for s in args.script.split(','):
-                scripts_to_run.append(s)
-
-        for script in profile['scripts'] + scripts_to_run:
-            print('\nExecuting script "%s"...' % str(script))
-            try:
-                if not run_script(instance, profile['username'], script):
-                    break
-            except Exception as e: 
-                print(str(e))
-                print('Script %s failed with above error' % script)
-    
-        print('Time to Run Scripts: %s' % str(time.time()-st))
-        
-        if args.activeprompt:
-            active_shell(instance, profile['username'])
-
