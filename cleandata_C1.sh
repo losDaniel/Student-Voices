@@ -4,6 +4,8 @@
 # -- pull scripts directory from github 
 # -- run data cleaning 
 
+pip install TextBlob
+pip install nltk 
 cd efs
 mkdir scripts
 cd scripts
