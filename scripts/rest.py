@@ -8,4 +8,4 @@ if __name__=='__main__':
 
 	args = parser.parse_args()
     
-	time.sleep(args.time)
+	time.sleep(int(args.time))
