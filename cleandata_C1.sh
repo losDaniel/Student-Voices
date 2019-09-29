@@ -17,4 +17,6 @@ git checkout cleaning_script
 git pull origin
 cd scripts 
 python modeling_tools.py
-nohup python analysis_a2_clean_data.py -c C1 > clean_C1.txt &
+nohup python analysis_a2_clean_data.py -c C1 &> clean_C1.txt &
+curpid=$!
+nohup sh -c 'while ps -p $0 > /dev/null; do sleep 10; done && sudo shutdown -h now' $curpid
