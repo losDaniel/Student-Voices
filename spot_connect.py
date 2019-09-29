@@ -484,8 +484,8 @@ if __name__ == '__main__':                                                     #
                         },
             "datasync":{'firewall_ingress': ('tcp', 22, 22, '0.0.0.0/0'),      # must enable nfs, http and other port ingress depending on endpoints https://docs.aws.amazon.com/datasync/latest/userguide/requirements.html#datasync-network
                         'image_id':'ami-0f2e06a04ee62ab37',                    # Datasync Image ID from AWS. List by region at https://docs.aws.amazon.com/datasync/latest/userguide/deploy-agents.html#ec2-deploy-agent 
-                        'instance_type':'t2.micro', # 'm5.2xlarge',                         # For recommended instance types for datasync https://docs.aws.amazon.com/datasync/latest/userguide/requirements.html#ec2-instance-types
-                        'price': '0.004',#'0.15',                                       # Spot instance pricing list at https://aws.amazon.com/ec2/spot/pricing/ 
+                        'instance_type':'m5.2xlarge',                          # For recommended instance types for datasync https://docs.aws.amazon.com/datasync/latest/userguide/requirements.html#ec2-instance-types
+                        'price': '0.15',                                       # Spot instance pricing list at https://aws.amazon.com/ec2/spot/pricing/ 
                         'region':'us-west-2',                                  # All settings for us-west-2. Datasync images vary by region, review all parameters if using a different region
                         'scripts':[],
                         'username':'ec2-user',
@@ -493,8 +493,8 @@ if __name__ == '__main__':                                                     #
                         },
             "cleaning1":{'firewall_ingress': ('tcp', 22, 22, '0.0.0.0/0'),     
                         'image_id':'ami-0859ec69e0492368e',                    
-                        'instance_type':'c5d.2xlarge',                         # VCPU Compute Optimized Instance for data cleaning                        
-                        'price':'0.14',
+                        'instance_type':'c5.4xlarge',                         # VCPU Compute Optimized Instance for data cleaning                        
+                        'price':'0.30',
                         'region':'us-west-2',                                  
                         'scripts':[],                            
                         'username':'ec2-user',                                 
