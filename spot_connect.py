@@ -493,7 +493,7 @@ if __name__ == '__main__':                                                     #
                         },
             "cleaning1":{'firewall_ingress': ('tcp', 22, 22, '0.0.0.0/0'),     
                         'image_id':'ami-0859ec69e0492368e',                    
-                        'instance_type':'c5.4xlarge',                         # VCPU Compute Optimized Instance for data cleaning                        
+                        'instance_type':'c5.4xlarge',                          # VCPU Compute Optimized Instance for data cleaning, bigger chip/more memory -> faster cleaning                     
                         'price':'0.30',
                         'region':'us-west-2',                                  
                         'scripts':[],                            
