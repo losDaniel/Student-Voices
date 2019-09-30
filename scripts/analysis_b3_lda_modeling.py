@@ -196,7 +196,7 @@ if __name__ == '__main__':
     #~#~#~#~#~#~#~#~#~#~#~#~#~#
     
     print('Importing Rating Ranges...', flush=True)
-    range_indices = bn.loosen(os.getcwd() + '/data/by_rating_range.pbz2')
+    range_indices = bn.decompress_pickle(os.getcwd() + '/data/by_rating_range.pbz2')
     ranges = list(np.sort(list(range_indices.keys())))                                 # create a list of each range 
 
     print('Loading Statistics Data...', flush=True)
