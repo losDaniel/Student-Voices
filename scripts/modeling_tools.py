@@ -369,6 +369,7 @@ def setup_text_training_data(docs, none_below, not_above):
 # Setup dictionaries 
 def set_dictionary(docs, nb=30, na=0.5):
     dictionary = Dictionary(docs)
+    print('Length of the dictionary is %s' % str(len(dictionary)), flush=True)
 
     # filter out words that occur less than X documents, or more than Y% of the documents.
     dictionary.filter_extremes(no_below=nb, no_above=na)
