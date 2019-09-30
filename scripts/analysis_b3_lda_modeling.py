@@ -24,9 +24,11 @@ def gen_lda_results(rng, setting, text, data, range_indices, lda_parameters, coh
     # get the rows in the data that you need 
     indices = data.loc[range_indices[rng],'Review_Length']
 
-    # filter the training corpus by review length and save the length 
     filtered_index = indices[indices>lda_parameters[setting][rng]['review_length']].index
+    print('Filtered the index for review length', flush=True)
+    
     docs = [text[idx] for idx in filtered_index]
+    print('Retrieved the filtered documents', flush=True)
 
     # save additional info to for the experimental record 
     lda_parameters[setting][rng]['filtered_length'] = len(docs)
@@ -186,7 +188,7 @@ if __name__ == '__main__':
     parser.add_argument('-c', '--configurations', help='Configuration A1,B1,C1,...', required=True)
     args = parser.parse_args()
     data_configurations = args.configurations.split(',')
-    cname = '_'.join(configurations)
+    cname = '_'.join(data_configurations)
     
     #~#~#~#~#~#~#~#~#~#~#~#~#~#
     #~#~# Load the Data #~#~#~#
@@ -208,12 +210,15 @@ if __name__ == '__main__':
 
     # load the hardcoded lda parameters dictionaries, if a results updated version exists load that
     if os.path.exists(os.getcwd()+'/results/lda_parameters_'+cname+'.pickle'):
+        print('Existing log detected. Loading log...', flush=True)
         lda_parameters = bn.loosen(os.getcwd()+'/results/lda_parameters_'+cname+'.pickle')
     else: 
+        print('No Log Detected. Loading Hardcoded LDA Paramters...', flush=True)
         lda_parameters = lda_parameters_hardcodes(ranges)
 
     # load any coherence scores that have been registered 
     if os.path.existsw(os.getcwd()+'/results/coherence_scores_'+cname+'.pickle'):
+        print('Existing coherence scores detected. Loading results...')
         coherence_guide = bn.loosen(os.getcwd()+'/results/coherence_scores_'+cname+'.pickle')
     else: 
         coherence_guide = {} 
@@ -224,25 +229,31 @@ if __name__ == '__main__':
     
     # check for an create the directories to store models and results
     if not os.path.exists(os.getcwd()+'/models/'):
+        print('No "models" directory found. Creating...', flush=True)
         os.mkdir(os.getcwd()+'/models/')
         
     if not os.path.exists(os.getcwd()+'/graphs/'):
+        print('No "graphs" directory found. Creating graphs & LDAGraphs...', flush=True)
         os.mkdir(os.getcwd()+'/graphs/')
         os.mkdir(os.getcwd()+'/graphs/LDAGraphs/')
 
     if not os.path.exists(os.getcwd()+'/results/LDA Descriptions/'):
+        print('No "LDADescriptions" directory found. Creating...', flush=True)
         os.mkdir(os.getcwd()+'/results/LDADescriptions/')
 
     if not os.path.exists(os.getcwd()+'/results/LDA Distributions/'):
+        print('No "LDADistributions" directory found. Creating...', flush=True)
         os.mkdir(os.getcwd()+'/results/LDADistributions/')
 
     #~#~#~#~#~#~#~#~#~#~#
     #~#~# Modeling  #~#~#
     #~#~#~#~#~#~#~#~#~#~#
 
+    print('Beginning modeling...', flush=True)
     for config in data_configurations:
         
         # load the cleaned text data
+        print('Loading data...', flush=True)
         text, stem_map, lemma_map, phrase_frequencies = bn.decompress_pickle(os.getcwd()+'/data/cleaned_data/cleaned_docs_'+config+'.pbz2')
 
         for setting in lda_parameters:
@@ -250,15 +261,18 @@ if __name__ == '__main__':
             model_directory = os.getcwd()+'/models/'+setting+'_'+config
 
             if not os.path.exists(model_directory):
+                print('Model directory not detected. Creating...', flush=True)
                 os.mkdir(model_directory)
+            else: 
+                print('Model directory detected...', flush=True)                
 
             # for each corpus (range) train a set of models with all the number of topics attempted in the ntrange key of the lda_parameters dictionary
             for rng in ranges: 
-                
+                print('Working on corpus '+str(rng), flush=True)
                 # if there are coherence scores in the parameters dictionary the work has been completed and we can skip it 
                 if 'coherence_scores' not in lda_parameters[setting][rng]:
-                                    
-                    print(str(rng), str(setting), str(config))
+                    
+                    print(str(rng)+' '+str(setting)+' '+str(config), flush=True)
                     
                     name = setting+'_'+config+'_'+rng                
                     # set the configuration for this lda_parameter setting and range
@@ -275,13 +289,13 @@ if __name__ == '__main__':
                                                                                                        model_directory, 
                                                                                                        name)
                     # save any progress on coherence scores
-                    bn.full_pickle(os.getcwd()+'/results/coherence_scores', coherence_guide)
+                    bn.full_pickle(os.getcwd()+'/results/coherence_scores_'+cname, coherence_guide)
                     # save any progress on the lda parameters
-                    bn.full_pickle(os.getcwd()+'/lda_parameters', lda_parameters)
+                    bn.full_pickle(os.getcwd()+'/results/lda_parameters_'+cname, lda_parameters)
 
     experimental_setup = pd.DataFrame()
     for setting in lda_parameters: 
             # we save the outcomes of the lda training to the exprerimental setup dataset 
             experimental_setup = experimental_setup.append(pd.DataFrame(lda_parameters[setting]).transpose())
 
-    experimental_setup.to_csv(os.getcwd()+'/results/experimental_register.csv')
+    experimental_setup.to_csv(os.getcwd()+'/results/experimental_register'+cname+'.csv')

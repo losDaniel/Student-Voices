@@ -23,6 +23,7 @@ def run_lda(docs, params, models_dir, name):
     corpus, dictionary, literal_dictionary, id2word, word2id = mt.set_dictionary(docs, 
                                                                               nb=params['nbelow'], 
                                                                               na=params['nabove'])
+    print('Set dictionary in %.3f seconds' % (time.time()-st), flush=True)
     # trains or loads pre-trained lda models 
     trained_models = train_ldas(corpus,
                                 params['passes'],
