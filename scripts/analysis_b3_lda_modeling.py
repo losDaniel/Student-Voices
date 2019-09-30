@@ -28,8 +28,8 @@ def gen_lda_results(rng, setting, text, data, range_indices, lda_parameters, coh
     print('Filtered the index for review length', flush=True)
     
     docs = [text[idx] for idx in filtered_index]
-    print('Retrieved the filtered documents', flush=True)
-
+    print('Retrieved the filtered documents, length is:', flush=True)
+    print(len(docs), flush=True)
     # save additional info to for the experimental record 
     lda_parameters[setting][rng]['filtered_length'] = len(docs)
     lda_parameters[setting][rng]['setting'] = setting
