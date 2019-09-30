@@ -375,7 +375,8 @@ def set_dictionary(docs, nb=30, na=0.5):
 
     # vectorize the docs by creating bag-of-words representations of the documents.
     corpus = [dictionary.doc2bow(doc) for doc in docs]
-    
+    print('Done filtering (in)frequent words, length of the corpus is %s' % str(len(corpus)), flush=True)
+
     # make an index to word dictionary to feed to the id2word argumend in the lda training command. 
     temp = dictionary[list(dictionary.keys())[0]]  # This is only to "load" the dictionary.
     id2word = dictionary.id2token
