@@ -186,7 +186,8 @@ if __name__ == '__main__':
     os.chdir("/home/ec2-user/efs")
 
     parser = argparse.ArgumentParser(description='Launch spot instance')
-    parser.add_argument('-c', '--configurations', help='Configuration A1,B1,C1,...', required=True)
+    parser.add_argument('-c', '--configuration', help='Configuration A1,B1,C1,...', required=True)
+    parser.add_argument('-s', '--setting', help='Settings LDA1, LDA2,...', required=True)
     args = parser.parse_args()
     data_configurations = args.configurations.split(',')
     cname = '_'.join(data_configurations)
@@ -204,6 +205,32 @@ if __name__ == '__main__':
 
     print('Loading Full Text Data...', flush=True)
     full_text = bn.decompress_pickle(os.getcwd()+'/data/full_review_text.pbz2')        # load the full text so we can pull samples 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     #~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#
     #~#~# Load Results Progress #~#~#~#
