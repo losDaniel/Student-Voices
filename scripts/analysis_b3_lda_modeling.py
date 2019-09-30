@@ -298,11 +298,11 @@ if __name__ == '__main__':
                                                                                                     model_directory, 
                                                                                                     name)
                     # save any progress on coherence scores
-                    bn.full_pickle(os.getcwd()+'/results/coherence_scores_'+cname, coherence_guide)
+                    bn.full_pickle(os.getcwd()+'/results/coherence_scores_'+run_name, coherence_guide)
                     print('Coherence Scores Saved.', flush=True)
                     
                     # save any progress on the lda parameters
-                    bn.full_pickle(os.getcwd()+'/results/lda_parameters_'+cname, lda_parameters)
+                    bn.full_pickle(os.getcwd()+'/results/lda_parameters_'+run_name, lda_parameters)
                     print('LDA Parameters Saved.', flush=True)
 
 
