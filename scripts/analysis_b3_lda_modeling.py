@@ -218,7 +218,7 @@ if __name__ == '__main__':
         lda_parameters = lda_parameters_hardcodes(ranges)
 
     # load any coherence scores that have been registered 
-    if os.path.existsw(os.getcwd()+'/results/coherence_scores_'+cname+'.pickle'):
+    if os.path.exists(os.getcwd()+'/results/coherence_scores_'+cname+'.pickle'):
         print('Existing coherence scores detected. Loading results...')
         coherence_guide = bn.loosen(os.getcwd()+'/results/coherence_scores_'+cname+'.pickle')
     else: 
