@@ -238,11 +238,11 @@ if __name__ == '__main__':
         os.mkdir(os.getcwd()+'/graphs/')
         os.mkdir(os.getcwd()+'/graphs/LDAGraphs/')
 
-    if not os.path.exists(os.getcwd()+'/results/LDA Descriptions/'):
+    if not os.path.exists(os.getcwd()+'/results/LDADescriptions/'):
         print('No "LDADescriptions" directory found. Creating...', flush=True)
         os.mkdir(os.getcwd()+'/results/LDADescriptions/')
 
-    if not os.path.exists(os.getcwd()+'/results/LDA Distributions/'):
+    if not os.path.exists(os.getcwd()+'/results/LDADistributions/'):
         print('No "LDADistributions" directory found. Creating...', flush=True)
         os.mkdir(os.getcwd()+'/results/LDADistributions/')
 
