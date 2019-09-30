@@ -47,11 +47,13 @@ except:
     from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.svm import LinearSVC 
 
-try: 
-    from textblob import TextBlob
-except: 
-    pip._internal.main(['install','TextBlob'])
-    from textblob import TextBlob
+# BUG: TextBlob does not import immediately after instalation 
+# try: 
+#     from textblob import TextBlob
+# except: 
+#     pip._internal.main(['install','TextBlob']) # try again just to secure
+#     pip._internal.main(['install','TextBlob'])
+#     from textblob import TextBlob
 
 cpu_count = multiprocessing.cpu_count()
 
@@ -373,9 +375,9 @@ def set_dictionary(docs, nb=30, na=0.5):
 
     # vectorize the docs by creating bag-of-words representations of the documents.
     corpus = [dictionary.doc2bow(doc) for doc in docs]
-
+    
     # make an index to word dictionary to feed to the id2word argumend in the lda training command. 
-    temp = dictionary[0]  # This is only to "load" the dictionary.
+    temp = dictionary[list(dictionary.keys())[0]]  # This is only to "load" the dictionary.
     id2word = dictionary.id2token
 
     # We also need a word to id dictionary for the guided LDA 
