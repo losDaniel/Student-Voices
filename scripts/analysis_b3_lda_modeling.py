@@ -280,15 +280,15 @@ if __name__ == '__main__':
                     lda_parameters[setting][rng]['data_configuration'] = config
     
                     # train models or load the ones that have already been trained 
-                    trained_models,corpus,dictionary,lda_parameters,coherence_guide=ld.gen_lda_results(rng,
-                                                                                                       setting,
-                                                                                                       text,
-                                                                                                       data,
-                                                                                                       range_indices,   
-                                                                                                       lda_parameters,
-                                                                                                       coherence_guide,
-                                                                                                       model_directory, 
-                                                                                                       name)
+                    trained_models,corpus,dictionary,lda_parameters,coherence_guide=gen_lda_results(rng,
+                                                                                                    setting,
+                                                                                                    text,
+                                                                                                    data,
+                                                                                                    range_indices,   
+                                                                                                    lda_parameters,
+                                                                                                    coherence_guide,
+                                                                                                    model_directory, 
+                                                                                                    name)
                     # save any progress on coherence scores
                     bn.full_pickle(os.getcwd()+'/results/coherence_scores_'+cname, coherence_guide)
                     print('Coherence Scores Saved.', flush=True)
