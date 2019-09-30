@@ -28,8 +28,8 @@ def gen_lda_results(rng, setting, text, data, range_indices, lda_parameters, coh
     print('Filtered the index for review length', flush=True)
     
     docs = [text[idx] for idx in filtered_index]
-    print('Retrieved the filtered documents', flush=True)
-
+    print('Retrieved the filtered documents, length is:', flush=True)
+    print(len(docs), flush=True)
     # save additional info to for the experimental record 
     lda_parameters[setting][rng]['filtered_length'] = len(docs)
     lda_parameters[setting][rng]['setting'] = setting
@@ -186,18 +186,22 @@ if __name__ == '__main__':
     os.chdir("/home/ec2-user/efs")
 
     parser = argparse.ArgumentParser(description='Launch spot instance')
-    parser.add_argument('-c', '--configuration', help='Configuration A1,B1,C1,...', required=True)
-    parser.add_argument('-s', '--setting', help='Settings LDA1, LDA2,...', required=True)
+    parser.add_argument('-c', '--configurations', help='Configuration A1,B1,C1,...', required=True)
+    parser.add_argument('-s', '--settings', help='Settings LDA1, LDA2,...', required=True)
     args = parser.parse_args()
+
+    print("Data configurations to work on are %s" % ', '.join(args.configurations.split(',')), flush=True)
     data_configurations = args.configurations.split(',')
-    cname = '_'.join(data_configurations)
+
+    print("Settings to work on are %s" % ', '.join(args.settings.split(',')), flush=True)
+    settings_to_run = args.settings.split(',')
     
     #~#~#~#~#~#~#~#~#~#~#~#~#~#
     #~#~# Load the Data #~#~#~#
     #~#~#~#~#~#~#~#~#~#~#~#~#~#
     
     print('Importing Rating Ranges...', flush=True)
-    range_indices = bn.loosen(os.getcwd() + '/data/by_rating_range.pickle')
+    range_indices = bn.decompress_pickle(os.getcwd() + '/data/by_rating_range.pbz2')
     ranges = list(np.sort(list(range_indices.keys())))                                 # create a list of each range 
 
     print('Loading Statistics Data...', flush=True)
@@ -205,6 +209,102 @@ if __name__ == '__main__':
 
     print('Loading Full Text Data...', flush=True)
     full_text = bn.decompress_pickle(os.getcwd()+'/data/full_review_text.pbz2')        # load the full text so we can pull samples 
+
+    #~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#
+    #~#~# Create  Directories #~#~#~#
+    #~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#
+    
+    # check for an create the directories to store models and results
+    if not os.path.exists(os.getcwd()+'/models/'):
+        print('No "models" directory found. Creating...', flush=True)
+        os.mkdir(os.getcwd()+'/models/')
+        
+    if not os.path.exists(os.getcwd()+'/graphs/'):
+        print('No "graphs" directory found. Creating graphs & LDAGraphs...', flush=True)
+        os.mkdir(os.getcwd()+'/graphs/')
+        os.mkdir(os.getcwd()+'/graphs/LDAGraphs/')
+
+    if not os.path.exists(os.getcwd()+'/results/LDAdescriptions/'):
+        print('No "LDADescriptions" directory found. Creating...', flush=True)
+        os.mkdir(os.getcwd()+'/results/LDAdescriptions/')
+
+    if not os.path.exists(os.getcwd()+'/results/LDAdistributions/'):
+        print('No "LDADistributions" directory found. Creating...', flush=True)
+        os.mkdir(os.getcwd()+'/results/LDADistributions/')
+
+    #~#~#~#~#~#~#~#~#~#~#
+    #~#~# Modeling  #~#~#
+    #~#~#~#~#~#~#~#~#~#~#
+
+    print('Beginning modeling...', flush=True)
+    for config in data_configurations:
+        
+        # load the cleaned text data
+        print('Loading data...', flush=True)
+        text, stem_map, lemma_map, phrase_frequencies = bn.decompress_pickle(os.getcwd()+'/data/cleaned_data/cleaned_docs_'+config+'.pbz2')
+
+        for setting in settings_to_run:
+            # check if the models directory for the current configuration exists 
+            model_directory = os.getcwd()+'/models/'+setting+'_'+config
+
+            if not os.path.exists(model_directory):
+                print('Model directory not detected. Creating...', flush=True)
+                os.mkdir(model_directory)
+            else: 
+                print('Model directory detected...', flush=True)                
+
+            #~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#
+            #~#~# Load Results Progress #~#~#~#
+            #~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#
+
+            run_name = setting+'_'+config
+
+            # load the hardcoded lda parameters dictionaries, if a results updated version exists load that
+            if os.path.exists(os.getcwd()+'/results/lda_parameters_'+run_name+'.pickle'):
+                print('Existing log detected. Loading log...', flush=True)
+                lda_parameters = bn.loosen(os.getcwd()+'/results/lda_parameters_'+run_name+'.pickle')
+            else: 
+                print('No Log Detected. Loading Hardcoded LDA Paramters...', flush=True)
+                lda_parameters = lda_parameters_hardcodes(ranges)
+
+            # load any coherence scores that have been registered 
+            if os.path.exists(os.getcwd()+'/results/coherence_scores_'+run_name+'.pickle'):
+                print('Existing coherence scores detected. Loading results...')
+                coherence_guide = bn.loosen(os.getcwd()+'/results/coherence_scores_'+run_name+'.pickle')
+            else: 
+                coherence_guide = {} 
+
+            # for each corpus (range) train a set of models with all the number of topics attempted in the ntrange key of the lda_parameters dictionary
+            for rng in ranges: 
+
+                print('Working on corpus '+str(rng), flush=True)
+                # if there are coherence scores in the parameters dictionary the work has been completed and we can skip it 
+                if 'coherence_scores' not in lda_parameters[setting][rng]:
+                    
+                    print(str(rng)+' '+str(setting)+' '+str(config), flush=True)
+                    
+                    name = setting+'_'+config+'_'+rng                
+                    # set the configuration for this lda_parameter setting and range
+                    lda_parameters[setting][rng]['data_configuration'] = config
+    
+                    # train models or load the ones that have already been trained 
+                    trained_models,corpus,dictionary,lda_parameters,coherence_guide=gen_lda_results(rng,
+                                                                                                    setting,
+                                                                                                    text,
+                                                                                                    data,
+                                                                                                    range_indices,   
+                                                                                                    lda_parameters,
+                                                                                                    coherence_guide,
+                                                                                                    model_directory, 
+                                                                                                    name)
+                    # save any progress on coherence scores
+                    bn.full_pickle(os.getcwd()+'/results/coherence_scores_'+cname, coherence_guide)
+                    print('Coherence Scores Saved.', flush=True)
+                    
+                    # save any progress on the lda parameters
+                    bn.full_pickle(os.getcwd()+'/results/lda_parameters_'+cname, lda_parameters)
+                    print('LDA Parameters Saved.', flush=True)
+
 
 
 
