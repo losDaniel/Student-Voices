@@ -42,9 +42,10 @@ def gen_lda_results(rng, setting, text, data, range_indices, lda_parameters, coh
 
     if 'duration' not in lda_parameters[setting][rng]: lda_parameters[setting][rng]['duration']
 
+    print('Determining coherence scores...')
     # get the ranked coherence models and the coherence
     ranked, coherences = ld.determine_coherence(trained_models, dictionary, docs)
-    
+
     # store the full coherence scores per topic in a separate dictionary object
     if rng not in coherence_guide: coherence_guide[rng]={} 
     if config not in coherence_guide[rng]: coherence_guide[rng][config]={}
@@ -290,12 +291,17 @@ if __name__ == '__main__':
                                                                                                        name)
                     # save any progress on coherence scores
                     bn.full_pickle(os.getcwd()+'/results/coherence_scores_'+cname, coherence_guide)
+                    print('Coherence Scores Saved.', flush=True)
+                    
                     # save any progress on the lda parameters
                     bn.full_pickle(os.getcwd()+'/results/lda_parameters_'+cname, lda_parameters)
+                    print('LDA Parameters Saved.', flush=True)
 
+    print('Finished for all configs...', flush=True)
     experimental_setup = pd.DataFrame()
     for setting in lda_parameters: 
             # we save the outcomes of the lda training to the exprerimental setup dataset 
             experimental_setup = experimental_setup.append(pd.DataFrame(lda_parameters[setting]).transpose())
 
     experimental_setup.to_csv(os.getcwd()+'/results/experimental_register'+cname+'.csv')
+    print('Saved experimental register...', flush=True)

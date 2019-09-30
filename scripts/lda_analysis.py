@@ -10,6 +10,9 @@ from gensim import models
 cpu_count = multiprocessing.cpu_count()
 print("Available Cores: %d" % cpu_count)
 
+# Home directory for the AWS instance
+os.chdir("/home/ec2-user/efs")
+
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 #-#-# MODELING  FUNCTIONS #-#-#
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
@@ -34,7 +37,7 @@ def run_lda(docs, params, models_dir, name):
                                 cores=cpu_count)
     # print how long it took to train
     duration = time.time() - st
-    print('Training all the models on the corpus took %s' % str(duration))
+    print('Training models for all the ranges on the corpus took %.3f' % duration, flush=True)
     
     return trained_models, corpus, dictionary, duration
 
@@ -106,10 +109,10 @@ def print_coherence_rankings(coherences, cm):
         [(num_topics, avg_coherence)
          for num_topics, (_, avg_coherence) in coherences.items()]
     ranked = sorted(avg_coherence, key=lambda tup: tup[1], reverse=True)
-    print("Ranked by average '%s' coherence:\n" % cm.coherence)
+    print("Ranked by average '%s' coherence:\n" % cm.coherence, flush=True)
     for item in ranked: 
-        print("num_topics=%d:\t%.4f" % item)
-    print("\nBest: %d" % ranked[0][0])
+        print("num_topics=%d:\t%.4f" % item, flush=True)
+    print("\nBest: %d" % ranked[0][0], flush=True)
     
     return ranked
 
@@ -119,9 +122,11 @@ def determine_coherence(trained_models, dictionary, docs):
     '''Determine model coherence for a dictionary of trained models'''
     # This performs a single pass over the reference corpus, accumulating
     # the necessary statistics for all of the models at once.
+    print('Estimating coherence for the models...', flush=True)
     cm = models.CoherenceModel.for_models(
         trained_models.values(), dictionary = dictionary, texts=docs, coherence='c_v')
 
+    print('Comparing the models...', flush=True)
     coherence_estimates = cm.compare_models(trained_models.values())
 
     coherences = dict(zip(trained_models.keys(), coherence_estimates))

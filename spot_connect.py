@@ -500,6 +500,15 @@ if __name__ == '__main__':                                                     #
                         'username':'ec2-user',                                 
                         'efs_mount':True                                     
                         },
+            "ldamodel1":{'firewall_ingress': ('tcp', 22, 22, '0.0.0.0/0'),     
+                        'image_id':'ami-0859ec69e0492368e',                    
+                        'instance_type':'c5d.9xlarge',                          # VCPU Compute Optimized Instance for data cleaning, bigger chip/more memory -> faster cleaning                     
+                        'price':'0.60',
+                        'region':'us-west-2',                                  
+                        'scripts':[],                            
+                        'username':'ec2-user',                                 
+                        'efs_mount':True                                     
+                        },
 #            "gateway":{'image_id':'ami-0a832317c0f4c5d01',}
     }
 
