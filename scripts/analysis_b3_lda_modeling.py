@@ -1,4 +1,4 @@
-import os, random
+import os, random, argparse
 import pip._internal
 import utils as bn 
 import lda_analysis as ld
@@ -179,32 +179,42 @@ def lda_parameters_hardcodes(ranges):
 
 if __name__ == '__main__':
     
+    # Home directory for the AWS instance
+    os.chdir("/home/ec2-user/efs")
+
+    parser = argparse.ArgumentParser(description='Launch spot instance')
+    parser.add_argument('-c', '--configurations', help='Configuration A1,B1,C1,...', required=True)
+    args = parser.parse_args()
+    data_configurations = args.configurations.split(',')
+    cname = '_'.join(configurations)
+    
     #~#~#~#~#~#~#~#~#~#~#~#~#~#
     #~#~# Load the Data #~#~#~#
     #~#~#~#~#~#~#~#~#~#~#~#~#~#
     
-    # import the range indices 
+    print('Importing Rating Ranges...', flush=True)
     range_indices = bn.loosen(os.getcwd() + '/data/by_rating_range.pickle')
-    # create a list of each range 
-    ranges = list(np.sort(list(range_indices.keys())))
-    # load the review statistics dataset 
-    data = bn.decompress_pickle(os.getcwd()+'/data/review_stats.pbz2')
-    # load the full text so we can pull samples 
-    full_text = bn.decompress_pickle(os.getcwd()+'/data/full_review_text.pbz2')
+    ranges = list(np.sort(list(range_indices.keys())))                                 # create a list of each range 
+
+    print('Loading Statistics Data...', flush=True)
+    data = bn.decompress_pickle(os.getcwd()+'/data/review_stats.pbz2')                 # load the review statistics dataset 
+
+    print('Loading Full Text Data...', flush=True)
+    full_text = bn.decompress_pickle(os.getcwd()+'/data/full_review_text.pbz2')        # load the full text so we can pull samples 
 
     #~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#
     #~#~# Load Results Progress #~#~#~#
     #~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#
 
     # load the hardcoded lda parameters dictionaries, if a results updated version exists load that
-    if os.path.exists(os.getcwd()+'/results/lda_parameters.pickle'):
-        lda_parameters = bn.loosen(os.getcwd()+'/results/lda_parameters.pickle')
+    if os.path.exists(os.getcwd()+'/results/lda_parameters_'+cname+'.pickle'):
+        lda_parameters = bn.loosen(os.getcwd()+'/results/lda_parameters_'+cname+'.pickle')
     else: 
         lda_parameters = lda_parameters_hardcodes(ranges)
 
     # load any coherence scores that have been registered 
-    if os.path.existsw(os.getcwd()+'/results/coherence_scores.pickle'):
-        coherence_guide = bn.loosen(os.getcwd()+'/results/coherence_scores.pickle')
+    if os.path.existsw(os.getcwd()+'/results/coherence_scores_'+cname+'.pickle'):
+        coherence_guide = bn.loosen(os.getcwd()+'/results/coherence_scores_'+cname+'.pickle')
     else: 
         coherence_guide = {} 
 
@@ -218,22 +228,19 @@ if __name__ == '__main__':
         
     if not os.path.exists(os.getcwd()+'/graphs/'):
         os.mkdir(os.getcwd()+'/graphs/')
-        os.mkdir(os.getcwd()+'/graphs/LDA Graphs/')
+        os.mkdir(os.getcwd()+'/graphs/LDAGraphs/')
 
     if not os.path.exists(os.getcwd()+'/results/LDA Descriptions/'):
-        os.mkdir(os.getcwd()+'/results/LDA Descriptions/')
+        os.mkdir(os.getcwd()+'/results/LDADescriptions/')
 
     if not os.path.exists(os.getcwd()+'/results/LDA Distributions/'):
-        os.mkdir(os.getcwd()+'/results/LDA Distributions/')
+        os.mkdir(os.getcwd()+'/results/LDADistributions/')
 
     #~#~#~#~#~#~#~#~#~#~#
     #~#~# Modeling  #~#~#
     #~#~#~#~#~#~#~#~#~#~#
-    
-    # list the data configurations we want to try 
-    data_configurations = ['A1','B1','C1']
-        
-    for config in data_configurations: 
+
+    for config in data_configurations:
         
         # load the cleaned text data
         text, stem_map, lemma_map, phrase_frequencies = bn.decompress_pickle(os.getcwd()+'/data/cleaned_data/cleaned_docs_'+config+'.pbz2')

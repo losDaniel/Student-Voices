@@ -225,11 +225,7 @@ if __name__ == '__main__':
         print('Cleaning '+str(config), flush=True)
         data_configurations = clean_data(config, text, data_configurations)
 
-    if not os.path.exists(os.getcwd()+'/data/results/'):
-        print('Results folder not detected. Creating...', flush=True)
-        os.mkdir(os.getcwd()+'/data/results/')
-
     # record the cleaning process       
     experimental_setup = pd.DataFrame(data_configurations)
-    experimental_setup.to_csv(os.getcwd()+'/results/cleaning_parameters.csv')       
-    print('Results summary saved to "cleaning_paramters.csv"', flush=True)
+    experimental_setup.to_csv(os.getcwd()+'/results/cleaning_parameters_'+'_'.join(configurations)+'.csv')       
+    print('Results summary saved to "cleaning_parameters_'+'_'.join(configurations)+'.csv"', flush=True)

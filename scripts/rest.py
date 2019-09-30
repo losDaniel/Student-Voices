@@ -8,4 +8,6 @@ if __name__=='__main__':
 
 	args = parser.parse_args()
     
+    os.mkdir(os.getcwd()+'/test/')
+
 	time.sleep(int(args.time))
