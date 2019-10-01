@@ -271,12 +271,14 @@ def rnumeric(docs):
     pt = time.time()
     out = [] 
     for idx, doc in enumerate(docs): 
+        mod_doc=[]
         if np.mod(idx,500000)==0:
             print(str((idx/len(docs))*100)+'%'+' Time: '+str(time.time()-st)+' Rate: '+str((time.time()-pt)), flush=True)
             pt = time.time()
         for token in doc:
             if not token.isnumeric():
-                out.append(token)
+                mod_doc.append(token)
+        out.append(mod_doc)
     return out 
 
 
