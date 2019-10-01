@@ -181,6 +181,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Launch spot instance')
     parser.add_argument('-c', '--configurations', help='Configuration A1,B1,C1,...', required=True)
+    parser.add_argument('-o', '--overwrite', help='Overwrite existing data', default=False)
     args = parser.parse_args()
 
     print('Beginning in '+os.getcwd(), flush=True)
@@ -211,8 +212,11 @@ if __name__ == '__main__':
     configurations = args.configurations.split(',')
     to_clean = [] 
     for config in configurations: 
-        if not os.path.exists(os.getcwd()+'/data/cleaned_data/cleaned_docs_'+config+'.pbz2'):
+        if args.overwrite:
             to_clean.append(config)
+        else: 
+            if not os.path.exists(os.getcwd()+'/data/cleaned_data/cleaned_docs_'+config+'.pbz2'):
+                to_clean.append(config)
     print('Conifgurations: '+', '.join([c for c in to_clean]), flush=True)
 
     # we load the full corpus of review texts everytime we loop through a configuration 
