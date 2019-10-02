@@ -150,7 +150,7 @@ def clean_docs(docs, # list of text documents (not tokenized)
                ):
     '''Clean the documents and return the cleaned documents, a map of stemmed words, and a map of phrases their frequency.'''        
     
-    print('Begnning Doc-wise Cleaning...', flush=True)
+    #print('Begnning Doc-wise Cleaning...', flush=True)
 
     docs = docs[:1000]
     
