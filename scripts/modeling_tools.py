@@ -47,11 +47,13 @@ except:
     from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.svm import LinearSVC 
 
-try: 
-    from textblob import TextBlob
-except: 
-    pip._internal.main(['install','TextBlob'])
-    from textblob import TextBlob
+# BUG: TextBlob does not import immediately after instalation 
+# try: 
+#     from textblob import TextBlob
+# except: 
+#     pip._internal.main(['install','TextBlob']) # try again just to secure
+#     pip._internal.main(['install','TextBlob'])
+#     from textblob import TextBlob
 
 cpu_count = multiprocessing.cpu_count()
 
@@ -149,18 +151,26 @@ def clean_docs(docs, # list of text documents (not tokenized)
     '''Clean the documents and return the cleaned documents, a map of stemmed words, and a map of phrases their frequency.'''        
     print('Begnning Doc-wise Cleaning...', flush=True)
 
+    docs = docs[:1000]
+
+    print(docs[0], flush=True)
+
     # Clean each document 
     docs = docwise_cleaning(docs, repeated_removal=repeated_removal, remove_contractions=remove_contractions)
 
     print('Basic Cleaning: Complete', flush=True) 
+    print(docs[0], flush=True)
    
     # Remove numbers, but not words that contain numbers. for the rmt corpus this is very useful in separating "grade" from "10th grade", "9th grade", ... which have very different meanings
     docs = rnumeric(docs)
     print('Filtering Out Numerics: Complete', flush=True)
+    print(docs[0], flush=True)
+
 
     # Remove words that are only one character. 
     docs = [[token for token in doc if len(token) > 1] for doc in docs] 
     print('Remove One Character Words: Complete', flush=True)
+    print(docs[0], flush=True)
     
     # remove stop words 
     if remove_stops: 
@@ -175,6 +185,7 @@ def clean_docs(docs, # list of text documents (not tokenized)
         docs = [[token for token in doc if token not in stop_words] for doc in docs] 
         print('Stop Word Removal: Complete', flush=True)
     
+    print(docs[0])
     # we can use the textblob module to implement spell_check and auto-corrections (this is even capable of capturing slang)
     if spell_check: 
         corrections = {} # TextBlob takes a bit to run so to avoid repeating lookups we create a dictionary 
@@ -185,17 +196,21 @@ def clean_docs(docs, # list of text documents (not tokenized)
         # when textblob fails to recognize a word it returns the same word
         docs = [[corrections[token] for token in doc] for doc in docs]            
         print('Spell Check: Complete', flush=True)
+
+    print(docs[0])
     
     # we're going to stem the words but create a map so we can trace the words back. We do so by using the populate stems function defined above 
     lemma_map = {}
     if lemmatizer: 
         docs = [[populate_stems(token, lemma_map, stemmer = WordNetLemmatizer()) for token in doc] for doc in docs]
         print('Lemmatization: Complete', flush=True)
+    print(docs[0])
 
     stem_map = {}
     if stemmer: 
         docs = [[populate_stems(token, stem_map, stemmer = PorterStemmer()) for token in doc] for doc in docs]
         print('Stemming: Complete', flush=True)
+    print(docs[0])
         
     return docs, stem_map, lemma_map
     
@@ -256,12 +271,14 @@ def rnumeric(docs):
     pt = time.time()
     out = [] 
     for idx, doc in enumerate(docs): 
+        mod_doc=[]
         if np.mod(idx,500000)==0:
             print(str((idx/len(docs))*100)+'%'+' Time: '+str(time.time()-st)+' Rate: '+str((time.time()-pt)), flush=True)
             pt = time.time()
         for token in doc:
             if not token.isnumeric():
-                out.append(token)
+                mod_doc.append(token)
+        out.append(mod_doc)
     return out 
 
 
@@ -366,16 +383,21 @@ def setup_text_training_data(docs, none_below, not_above):
 
 # Setup dictionaries 
 def set_dictionary(docs, nb=30, na=0.5):
+    print(docs[0], flush=True)
     dictionary = Dictionary(docs)
+    print('Length of the dictionary is %s' % str(len(dictionary)), flush=True)
 
     # filter out words that occur less than X documents, or more than Y% of the documents.
     dictionary.filter_extremes(no_below=nb, no_above=na)
 
     # vectorize the docs by creating bag-of-words representations of the documents.
     corpus = [dictionary.doc2bow(doc) for doc in docs]
+    print('Done filtering (in)frequent words', flush=True) 
+    print('Length of the corpus is %s' % str(len(corpus)), flush=True)
+    print('Length of the dictionary is %s' % str(len(dictionary)), flush=True)
 
     # make an index to word dictionary to feed to the id2word argumend in the lda training command. 
-    temp = dictionary[0]  # This is only to "load" the dictionary.
+    temp = dictionary[list(dictionary.keys())[0]]  # This is only to "load" the dictionary.
     id2word = dictionary.id2token
 
     # We also need a word to id dictionary for the guided LDA 
