@@ -177,7 +177,7 @@ def launch_spot_instance(spotid, profile, monitoring=True, spot_wait_sleep=5, in
                 time.sleep(spot_wait_sleep)
         else: 
             if attempt==0:
-                print('>>Launching...')
+                print('>> Launching...')
             sys.stdout.write(".")
             sys.stdout.flush()                                                 # If a new spot request was submitted it may take a moment to register
             time.sleep(spot_wait_sleep)                                        # Wait and attempt to connect again 
@@ -201,12 +201,12 @@ def launch_spot_instance(spotid, profile, monitoring=True, spot_wait_sleep=5, in
             instance_up=True        
         else:
             if attempt==0:
-                print('>>Waiting for instance to boot')    
+                print('..Waiting for instance to boot')    
             time.sleep(instance_wait_sleep)
             attempt+=1 
     if instance_status!='ok':                                                  # Wait until the instance is runing to connect 
         raise Exception('Failed to boot, instance status: %s' % str(instance_status))
-    print('>>Online')
+    print('..Online')
 
     return instance, profile                                                   # Return the instance and profile in case a key and security group were added to the profile 
 
@@ -228,7 +228,8 @@ def connect_to_instance(ip, keyfile, username='ec2-user', port=22, timeout=10):
     k = paramiko.RSAKey.from_private_key_file(keyfile+'.pem')                  # Create an RSA key from the key file to avoid runtime 
     retries = 0 
     connected = False 
-    print('Connecting...')
+    sys.stdout.write('>> Connecting...')
+    sys.stdout.flush() 
     while connected==False: 
         try:
             # use the public IP address to connect to an instance over the internet, default username is ubuntu
@@ -241,37 +242,41 @@ def connect_to_instance(ip, keyfile, username='ec2-user', port=22, timeout=10):
             sys.stdout.flush() 
             if retries>=5: 
                 raise e  
-    print('Connected')
+    sys.stdout.write('..Connected\n')
     return ssh_client
 
 
 
-def run_script(instance, user_name, script_file, port=22):
+def run_script(instance, user_name, script, cmd=False, port=22):
     '''
     Run a script on the the given instance 
     __________
     parameters
     - instance : dict. Response dictionary from ec2 instance describe_instances method 
     - user_name : string. SSH username for accessing instance, default usernames for AWS images can be found at https://alestic.com/2014/01/ec2-ssh-username/
-    - script_file : string. ".sh" file or linux/unix command (or other os resource) to execute on the instance command line 
+    - script : string. ".sh" file or linux/unix command (or other os resource) to execute on the instance command line 
+    - cmd : if True, script string is treated as an individual argument 
     - port : port to use to connect to the instance 
     '''
-    script = open(script_file, 'r').read().replace('\r', '')
+    if cmd: 
+        commands = script
+    else:   
+        commands = open(script, 'r').read().replace('\r', '')
     
     client = connect_to_instance(instance['PublicIpAddress'],instance['KeyName'],username=user_name,port=port)
     session = client.get_transport().open_session()
     session.set_combine_stderr(True)                                           # Combine the error message and output message channels
 
-    session.exec_command(script)                                               # Execute a command or .sh script (unix or linux console)
+    session.exec_command(commands)                                             # Execute a command or .sh script (unix or linux console)
     stdout = session.makefile()                                                # Collect the output 
     try:
         for line in stdout:
-            print(line.rstrip())                                               # Show the output 
+            print(line.rstrip(), flush=True)                                   # Show the output 
     except (KeyboardInterrupt, SystemExit):
-        print(sys.stderr, 'Ctrl-C, stopping')
+        print(sys.stderr, 'Ctrl-C, stopping', flush=True)                      # Keyboard interrupt 
     client.close()                                                             # Close the connection 
     exit_code = session.recv_exit_status()
-    print('Closed connection. Exit code: ' + str(exit_code))
+    print('Scripts run, closed connection. Exit code: ' + str(exit_code))
     return True
 
 
@@ -325,16 +330,17 @@ def launch_efs(system_name, region='us-west-2', launch_wait=3):
                 time.sleep(launch_wait)
         print('Detected')
     else: 
-        print('EFS file system already exists...')
+        print('...EFS file system already exists')
         file_system = file_systems[0]                                          # If the file system exists 
                 
     available=False
-    print('Waiting for availability...')
+    sys.stdout.write('Waiting for availability...')
+    sys.stdout.flush() 
     while not available: 
         file_system = client.describe_file_systems(CreationToken=system_name)['FileSystems'][0]
         if file_system['LifeCycleState']=='available':
             available=True
-            print('Available')
+            print('...Available')
         else: 
             sys.stdout.write(".")
             sys.stdout.flush() 
@@ -397,12 +403,12 @@ def retrieve_efs_mount(file_system_name, instance, new_mount=False, region='us-w
     filesystem_dns = file_system_id+'.efs.'+region+'.amazonaws.com'
     
     with open('efs_mount.sh','w') as f:                                        # how to mount EFS on EC2: https://docs.aws.amazon.com/efs/latest/ug/wt1-test.html
-        f.write('sudo yum -y install nfs-utils'+'\n')
-        f.write('mkdir ~/efs'+'\n')
+        #f.write('sudo yum -y install nfs-utils'+'\n')
+        f.write('mkdir ~/efs &> /dev/null'+'\n')
         f.write('sudo mount -t nfs -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport '+filesystem_dns+':/   ~/efs '+'\n')
         f.write('cd ~/efs'+'\n')
         f.write('sudo chmod go+rw .'+'\n')
-        f.write('mkdir ~/efs/data'+'\n')
+        f.write('mkdir ~/efs/data &> /dev/null'+'\n')
         f.close() 
             
     return mount_target, instance_dns, filesystem_dns
@@ -452,3 +458,10 @@ def terminate_instance(instance_id):
         raise Exception('instance_id arg must be str or list')
     ec2 = boto3.resource('ec2')
     ec2.instances.filter(InstanceIds=instances).terminate()
+
+
+def show_instances(): 
+    client = boto3.client('ec2', region_name='us-west-2')
+    print('Instances (by Key names):')
+    for i in [res['Instances'][0] for res in client.describe_instances()['Reservations']]:
+        print('     - "'+i['KeyName'].split('-')[1]+'" Type: '+i['InstanceType']+', ID: '+i['InstanceId'], flush=True)
