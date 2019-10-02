@@ -22,19 +22,9 @@ mkdir graphs
 cd graphs 
 mkdir LDAGraphs
 
-cd ..
-mkdir scripts 
-cd scripts
-# Pull the scripts from github
-git init
-git config core.sparsecheckout true
-echo scripts/ >> .git/info/sparse-checkout
-git remote add -f origin https://github.com/losDaniel/Student-Voices.git
-git checkout cleaning_script
-git pull origin
-
-# Install TextBlob and NLTK
+# Install Text Blob
 pip install TextBlob
+# Install NLTK
 pip install nltk 
 
 python -m nltk.downloader all

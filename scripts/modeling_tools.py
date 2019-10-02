@@ -152,7 +152,7 @@ def clean_docs(docs, # list of text documents (not tokenized)
     print('Begnning Doc-wise Cleaning...', flush=True)
 
     docs = docs[:1000]
-
+    
     print(docs[0], flush=True)
 
     # Clean each document 

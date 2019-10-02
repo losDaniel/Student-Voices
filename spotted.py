@@ -179,7 +179,7 @@ class spotted:
             if not cmd:
                 print('\nExecuting script "%s"...' % str(script))
             try:
-                if not spt.run_script(self.instance, self.profile['username'], script):
+                if not spt.run_script(self.instance, self.profile['username'], script, cmd=cmd):
                     break
             except Exception as e: 
                 print(str(e))
