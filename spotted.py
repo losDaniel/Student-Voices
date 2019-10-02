@@ -48,6 +48,20 @@ class spotted:
                         },
     }     
 
+    name=''
+    profile={}
+    monitoring=True
+    filesystem=''
+    efs_mount=True
+    newmount=''
+    firewall=()
+    image_id=''
+    price=''
+    region=''
+    username=''
+    key_pair=''
+    sec_group=''    
+    
     def __init__(self,
                  name,
                  profile='default',
@@ -101,7 +115,7 @@ class spotted:
         if username!='':
             self.profile['username']=username
         if key_pair!='': 
-            self.profile['key_pair']=profile                                   
+            self.profile['key_pair']=profile
         if sec_group!='':
             self.profile['security_group']=sec_group                           
                
@@ -111,6 +125,7 @@ class spotted:
         print('#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#', flush=True)
         print('', flush=True)
 
+        print(self.profile)
         try:                                     # Launch or connect to the spot instance under the given name
             # Returns the profile with any parameters that needed to be added automatically in order to connect (Key Pair and Security Group)                                                                 
             self.instance, self.profile = spt.launch_spot_instance(self.name, self.profile, self.monitoring)   

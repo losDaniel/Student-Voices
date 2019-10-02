@@ -147,8 +147,9 @@ def clean_docs(docs, # list of text documents (not tokenized)
                remove_contractions=True, # do you want to replace contractions 
                repeated_removal=2, # remove characters that repeat at least this number of times 
                spell_check = False # set to True if you want to use TextBlob to correct misspellings
-               ): 
+               ):
     '''Clean the documents and return the cleaned documents, a map of stemmed words, and a map of phrases their frequency.'''        
+    
     print('Begnning Doc-wise Cleaning...', flush=True)
 
     docs = docs[:1000]
