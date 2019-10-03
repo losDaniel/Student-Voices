@@ -12,9 +12,12 @@ cd scripts
 python modeling_tools.py
 
 # Pull the arguments to pass to the command and save the log 
-ARG=$1
-TXTFILE="clean_$ARG.txt"
-nohup python cleaning.py -c $ARG -o True &> $TXTFILE &
+# ARG=$1
+# TXTFILE="clean_$ARG.txt"
+# nohup python cleaning.py -c $ARG -o True &> $TXTFILE &
+
+# Rigged to run with notebook
+nohup python cleaning.py -c DC_CONFIG -o True &> DC_OUTFILE &
 curpid=$!
 
 # Wait until the previous job is done and then shutdown the instance 
