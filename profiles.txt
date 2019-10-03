@@ -26,7 +26,7 @@
                 'username':'ec2-user',                                 
                 'efs_mount':True                                     
                 },
-    "cleaning2":{'firewall_ingress': ('tcp', 22, 22, '0.0.0.0/0'),     
+    "lda1":{'firewall_ingress': ('tcp', 22, 22, '0.0.0.0/0'),     
                 'image_id':'ami-0859ec69e0492368e',                    
                 'instance_type':'c5d.9xlarge', 
                 'price':'0.60',
