@@ -13,13 +13,13 @@ python modeling_tools.py
 python lda_analysis.py
 
 # # Pull the arguments to pass to the command and save the log 
-# DC_CONFIG=$1
+# A1=$1
 # SET=$2
 # TXTFILE="LDA_$CON_$SET.txt"
 # nohup sudo python lda_modeling.py -c $CON -s $SET &> $TXTFILE &
 # curpid=$!
 
-nohup python lda_modeling.py -c DC_CONFIG -s SETTING &> OUTFILE &
+nohup sudo python lda_modeling.py -c A1 -s LDA1 &> lda_A1_LDA1.txt &
 curpid=$!
 
 # Wait until the previous job is done and then shutdown the instance 
