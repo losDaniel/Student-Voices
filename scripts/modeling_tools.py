@@ -46,13 +46,12 @@ except:
     from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.svm import LinearSVC 
 
-# BUG: TextBlob does not import immediately after instalation 
-# try: 
-#     from textblob import TextBlob
-# except: 
-#     pip._internal.main(['install','TextBlob']) # try again just to secure
-#     pip._internal.main(['install','TextBlob'])
-#     from textblob import TextBlob
+try: 
+    from textblob import TextBlob
+except: 
+    pip._internal.main(['install','TextBlob']) # try again just to secure
+    pip._internal.main(['install','TextBlob'])
+    from textblob import TextBlob
 
 cpu_count = multiprocessing.cpu_count()
 
