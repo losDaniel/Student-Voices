@@ -1,8 +1,5 @@
 # To be run within an instance 
-# Run the data cleaning: 
-# -- create the directories you need 
-# -- pull scripts directory from github 
-# -- run data cleaning 
+# Run the data cleaning
 
 cd efs 
 cd scripts 
@@ -17,7 +14,7 @@ python modeling_tools.py
 # nohup python cleaning.py -c $ARG -o True &> $TXTFILE &
 
 # Rigged to run with notebook
-nohup python cleaning.py -c A1 -o True &> clean_A1.txt &
+nohup python cleaning.py -c H1 -o True &> clean_H1.txt &
 curpid=$!
 
 # Wait until the previous job is done and then shutdown the instance 

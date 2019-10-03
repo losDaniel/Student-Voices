@@ -1,8 +1,5 @@
 # To be run within an instance 
-# Run the data cleaning: 
-# -- create the directories you need 
-# -- pull scripts directory from github 
-# -- run data cleaning 
+# Run the data cleaning
 
 cd efs 
 cd scripts 
