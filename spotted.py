@@ -47,7 +47,7 @@ class spotted:
         if profile is None: 
             self.profile=spotted.profiles['default'] 
         else: 
-            self.profile=profile 
+            self.profile=spotted.profiles[profile] 
         if monitoring is None: 
             self.monitoring=True
         else: 
@@ -60,7 +60,7 @@ class spotted:
             self.newmount=False
         else:              
             self.newmount=newmount        
-        
+                
         if efs_mount is not None: 
             self.profile['efs_mount']=efs_mount
         if firewall is not None:

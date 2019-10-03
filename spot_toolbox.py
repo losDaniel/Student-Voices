@@ -281,10 +281,9 @@ def run_script(instance, user_name, script, cmd=False, port=22):
     except (KeyboardInterrupt, SystemExit):
         print(sys.stderr, 'Ctrl-C, stopping', flush=True)                      # Keyboard interrupt 
     client.close()                                                             # Close the connection 
-    exit_code = session.recv_exit_status()
+    exit_code = session.exit_status_ready()
     print('Scripts run, closed connection. Exit code: ' + str(exit_code))
     return True
-
 
 
 def active_shell(instance, user_name, port=22): 
@@ -378,8 +377,8 @@ def retrieve_efs_mount(file_system_name, instance, new_mount=False, region='us-w
             try: 
                 response = client.create_mount_target(                                 # Create the mount target 
                     FileSystemId=file_system_id,                                       # Under the file system just created 
-                    SubnetId=subnet_id,                                                # Under the same subnet as the EC2 instance you've just created 
-                    IpAddress=ips[ipid],                                                  # Assign it the first IP Adress from the CIDR block assigned to the subnet 
+                    SubnetId=subnet_id,                                        # Under the same subnet as the EC2 instance you've just created 
+                    IpAddress=ips[ipid],                                       # Assign it the first IP Adress from the CIDR block assigned to the subnet 
                     SecurityGroups=[
                         security_group_id,                                             # Apply the security group which must have ingress rules to allow NFS client connections (enable port 2049)
                     ]
