@@ -1,0 +1,38 @@
+{
+    "default": {'firewall_ingress': ('tcp', 22, 22, '0.0.0.0/0'),      
+            'image_id':'ami-0859ec69e0492368e',                    
+            'instance_type':'t2.micro',   
+            'price':'0.004',
+            'region':'us-west-2',                                   
+            'scripts':[],                            
+            'username':'ec2-user',                                 
+            'efs_mount':True                                       
+            },
+    "datasync":{'firewall_ingress': ('tcp', 22, 22, '0.0.0.0/0'),      
+                'image_id':'ami-0f2e06a04ee62ab37',                    
+                'instance_type':'m5.2xlarge',                          
+                'price': '0.15',                                       
+                'region':'us-west-2',                                  
+                'scripts':[],
+                'username':'ec2-user',
+                'efs_mount':False                                     
+                },
+    "cleaning1":{'firewall_ingress': ('tcp', 22, 22, '0.0.0.0/0'),     
+                'image_id':'ami-0859ec69e0492368e',                    
+                'instance_type':'c5d.4xlarge', 
+                'price':'0.30',
+                'region':'us-west-2',                                  
+                'scripts':[],                            
+                'username':'ec2-user',                                 
+                'efs_mount':True                                     
+                },
+    "lda1":{'firewall_ingress': ('tcp', 22, 22, '0.0.0.0/0'),     
+                'image_id':'ami-0859ec69e0492368e',                    
+                'instance_type':'c5d.9xlarge', 
+                'price':'0.60',
+                'region':'us-west-2',                                  
+                'scripts':[],                            
+                'username':'ec2-user',                                 
+                'efs_mount':True                                     
+                },
+}  

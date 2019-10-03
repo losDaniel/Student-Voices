@@ -27,7 +27,13 @@ except:
     pip._internal.main(['install', 'boto3'])
     import boto3    
     
-import time, os, sys, interactive
+import time, os, sys, interactive, ast
+
+
+def load_profiles():
+    with open('profiles.txt','r') as f:
+        profiles = ast.literal_eval(f.read())
+    return profiles
 
 def launch_spot_instance(spotid, profile, monitoring=True, spot_wait_sleep=5, instance_wait_sleep=5, key_pair_dir=os.getcwd(), enable_nfs=True, enable_ds=True):
     '''
@@ -201,7 +207,8 @@ def launch_spot_instance(spotid, profile, monitoring=True, spot_wait_sleep=5, in
             instance_up=True        
         else:
             if attempt==0:
-                print('..Waiting for instance to boot')    
+                sys.stdout.write('Waiting for instance to boot...')   
+                sys.stdout.flush()  
             time.sleep(instance_wait_sleep)
             attempt+=1 
     if instance_status!='ok':                                                  # Wait until the instance is runing to connect 
@@ -275,10 +282,8 @@ def run_script(instance, user_name, script, cmd=False, port=22):
     except (KeyboardInterrupt, SystemExit):
         print(sys.stderr, 'Ctrl-C, stopping', flush=True)                      # Keyboard interrupt 
     client.close()                                                             # Close the connection 
-    exit_code = session.recv_exit_status()
-    print('Scripts run, closed connection. Exit code: ' + str(exit_code))
+    
     return True
-
 
 
 def active_shell(instance, user_name, port=22): 
@@ -372,8 +377,8 @@ def retrieve_efs_mount(file_system_name, instance, new_mount=False, region='us-w
             try: 
                 response = client.create_mount_target(                                 # Create the mount target 
                     FileSystemId=file_system_id,                                       # Under the file system just created 
-                    SubnetId=subnet_id,                                                # Under the same subnet as the EC2 instance you've just created 
-                    IpAddress=ips[ipid],                                                  # Assign it the first IP Adress from the CIDR block assigned to the subnet 
+                    SubnetId=subnet_id,                                        # Under the same subnet as the EC2 instance you've just created 
+                    IpAddress=ips[ipid],                                       # Assign it the first IP Adress from the CIDR block assigned to the subnet 
                     SecurityGroups=[
                         security_group_id,                                             # Apply the security group which must have ingress rules to allow NFS client connections (enable port 2049)
                     ]
@@ -425,7 +430,7 @@ def printTotals(transferred, toBeTransferred):
 
 def upload_to_ec2(instance, user_name, files, remote_dir='.'):
     '''
-    Upload files directly to an EC2 instance. This method can be slow. 
+    Upload files directly to an EC2 instance. Speed depends on internet connection and not instance type. 
     __________
     parameters 
     - instance : dict. Response dictionary from ec2 instance describe_instances method 
@@ -433,7 +438,6 @@ def upload_to_ec2(instance, user_name, files, remote_dir='.'):
     - files : string or list of strings. single file, list of files or directory to upload. If it is a directory end in "/" 
     - remote_dir : '.'  string.The directory on the instance where the files will be uploaded to 
     '''
-    print('Connecting...')
     client = connect_to_instance(instance['PublicIpAddress'],instance['KeyName'],username='ec2-user',port=22)
     print('Connected. Uploading files...')
     stfp = client.open_sftp()
@@ -446,6 +450,29 @@ def upload_to_ec2(instance, user_name, files, remote_dir='.'):
     print('Uploaded to %s' % remote_dir)
     return True 
     
+
+def download_from_ec2(instance, username, get, put='.'):
+    '''
+    Download files directly from an EC2 instance. Speed depends on internet connection and not instance type. 
+    __________
+    parameters 
+    - instance : dict. Response dictionary from ec2 instance describe_instance method 
+    - user_name : string. SSH username for accessing instance, default usernames for AWS images can be found at https://alestic.com/2014/01/ec2-ssh-username/
+    - get : str or list of str. File or list of file paths to get from the instance 
+    - put : str or list of str. Folder to place the files in `get` 
+    '''
+    client = boto3.client('ec2', region_name='us-west-2')
+    client = connect_to_instance(instance['PublicIpAddress'],instance['KeyName'],username=username,port=22)
+
+    stfp = client.open_sftp()
+
+    for idx, file in enumerate(get): 
+        try: 
+            stfp.get(file,put[idx], callback=printTotals)
+        except Exception as e: 
+            print(file)
+            raise e
+    return True 
 
 
 def terminate_instance(instance_id):

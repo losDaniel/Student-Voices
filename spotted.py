@@ -9,60 +9,23 @@ import sys, time, os
 
 class spotted: 
     
-    profiles={
-            "default": {'firewall_ingress': ('tcp', 22, 22, '0.0.0.0/0'),      # Must define a firewall ingress rule in order to connect to an instance 
-                        'image_id':'ami-0859ec69e0492368e',                    # Image ID from AWS. go to the launch-wizard to get the image IDs or use the boto3 client.describe_images() with Owners of Filters parameters to reduce wait time and find what you need.
-                        'instance_type':'t2.micro',                            # Get a list of instance types and prices at https://aws.amazon.com/ec2/spot/pricing/ 
-                        'price':'0.004',
-                        'region':'us-west-2',                                  # All settings for us-west-2. Parameters (including prices) can change by region, make sure to review all parameters if changing regions.  
-                        'scripts':[],                            
-                        'username':'ec2-user',                                 # This will usually depend on the operating system of the image used. For a list of operating systems and defaul usernames check https://alestic.com/2014/01/ec2-ssh-username/
-                        'efs_mount':True                                       # If true will check for an EFS mount in the instance and if one is not found it will create a file system or use an existing one and mount it. 
-                        },
-            "datasync":{'firewall_ingress': ('tcp', 22, 22, '0.0.0.0/0'),      # must enable nfs, http and other port ingress depending on endpoints https://docs.aws.amazon.com/datasync/latest/userguide/requirements.html#datasync-network
-                        'image_id':'ami-0f2e06a04ee62ab37',                    # Datasync Image ID from AWS. List by region at https://docs.aws.amazon.com/datasync/latest/userguide/deploy-agents.html#ec2-deploy-agent 
-                        'instance_type':'m5.2xlarge',                          # For recommended instance types for datasync https://docs.aws.amazon.com/datasync/latest/userguide/requirements.html#ec2-instance-types
-                        'price': '0.15',                                       # Spot instance pricing list at https://aws.amazon.com/ec2/spot/pricing/ 
-                        'region':'us-west-2',                                  # All settings for us-west-2. Datasync images vary by region, review all parameters if using a different region
-                        'scripts':[],
-                        'username':'ec2-user',
-                        'efs_mount':False                                      # No need to mount an EFS on a datasync agent (ec2 Instance with a datasync image)
-                        },
-            "cleaning1":{'firewall_ingress': ('tcp', 22, 22, '0.0.0.0/0'),     
-                        'image_id':'ami-0859ec69e0492368e',                    
-                        'instance_type':'c5.4xlarge',                          # VCPU Compute Optimized Instance for data cleaning, bigger chip/more memory -> faster cleaning                     
-                        'price':'0.30',
-                        'region':'us-west-2',                                  
-                        'scripts':[],                            
-                        'username':'ec2-user',                                 
-                        'efs_mount':True                                     
-                        },
-            "ldamodel1":{'firewall_ingress': ('tcp', 22, 22, '0.0.0.0/0'),     
-                        'image_id':'ami-0859ec69e0492368e',                    
-                        'instance_type':'c5d.9xlarge',                          # VCPU Compute Optimized Instance for data cleaning, bigger chip/more memory -> faster cleaning                     
-                        'price':'0.60',
-                        'region':'us-west-2',                                  
-                        'scripts':[],                            
-                        'username':'ec2-user',                                 
-                        'efs_mount':True                                     
-                        },
-    }     
-
+    profiles=spt.load_profiles()         
+    
     def __init__(self,
                  name,
-                 profile='default',
-                 monitoring=True,
-                 filesystem='',
-                 efs_mount=True,
-                 newmount='',
-                 firewall=(),
-                 image_id='',
-                 instance_type='',
-                 price='',
-                 region='',
-                 username='',
-                 key_pair='',
-                 sec_group=''):
+                 profile=None,
+                 monitoring=None,
+                 filesystem=None,
+                 efs_mount=None,
+                 newmount=None,
+                 firewall=None,
+                 image_id=None,
+                 instance_type=None,
+                 price=None,
+                 region=None,
+                 username=None,
+                 key_pair=None,
+                 sec_group=None):
         '''
         A class to run, control and interact with spot instances. 
         __________
@@ -81,28 +44,40 @@ class spotted:
         '''
 
         self.name=name 
-        self.profile=spotted.profiles[profile] 
-        self.monitoring=monitoring
-        self.filesystem=filesystem
-        self.newmount=newmount        
-        
-        if not efs_mount: 
+        if profile is None: 
+            self.profile=spotted.profiles['default'] 
+        else: 
+            self.profile=spotted.profiles[profile] 
+        if monitoring is None: 
+            self.monitoring=True
+        else: 
+            self.monitoring=monitoring
+        if filesystem is None: 
+            self.filesystem=''
+        else:
+            self.filesystem=filesystem
+        if newmount is None:   
+            self.newmount=False
+        else:              
+            self.newmount=newmount        
+                
+        if efs_mount is not None: 
             self.profile['efs_mount']=efs_mount
-        if firewall!=():
+        if firewall is not None:
             self.profile['firewall']=firewall
-        if image_id!='':
+        if image_id is not None:
             self.profile['image_id']=image_id
-        if instance_type!='':
+        if instance_type is not None:
             self.profile['instance_type']=instance_type
-        if str(price)!='':
+        if price is not None:
             self.profile['price']=price
-        if region!='':
+        if region is not None:
             self.profile['region']=region
-        if username!='':
+        if username is not None:
             self.profile['username']=username
-        if key_pair!='': 
-            self.profile['key_pair']=profile                                   
-        if sec_group!='':
+        if key_pair is not None:
+            self.profile['key_pair']=profile
+        if sec_group is not None:
             self.profile['security_group']=sec_group                           
                
         print('', flush=True)
@@ -110,6 +85,8 @@ class spotted:
         print('#~#~#~#~#~#~#~# Spot Instance: '+self.name, flush=True)
         print('#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#', flush=True)
         print('', flush=True)
+        print(self.profile)
+        print('')
 
         try:                                     # Launch or connect to the spot instance under the given name
             # Returns the profile with any parameters that needed to be added automatically in order to connect (Key Pair and Security Group)                                                                 
@@ -159,6 +136,34 @@ class spotted:
         spt.upload_to_ec2(self.instance, self.profile['username'], files_to_upload, remote_dir=remotepath)    
     
         print('Time to Upload: %s' % str(time.time()-st))
+        
+    def download(self, files, remotepath):
+        '''
+        Upload a file or list of files to the instance. If an EFS is connected to the instance files can be uploaded to the EFS through the instnace. 
+        __________
+        parameters
+        - files : str or list of str. file or list of files to upload
+        - remotepath : str or list of str. path to upload files to, only one path can be specified. 
+        '''
+        if type(files)==str: 
+            files = [files]
+        elif type(files)!=list: 
+            raise TypeError('get must be str or list of str')
+        if type(remotepath) is str: 
+            remotepath = [remotepath]*len(files)
+        elif type(remotepath)==list: 
+            assert(len(remotepath)==len(files))
+        else: 
+            raise TypeError('put must be str or list of str with equal length to `get`')
+
+        st = time.time() 
+            
+        files_to_download = [] 
+        for file in files:
+            files_to_download.append(file)
+        spt.download_from_ec2(self.instance, self.profile['username'], files_to_download, put=remotepath)
+    
+        print('Time to Download: %s' % str(time.time()-st))
 
     def run(self, scripts, cmd=False):
         '''
@@ -179,7 +184,7 @@ class spotted:
             if not cmd:
                 print('\nExecuting script "%s"...' % str(script))
             try:
-                if not spt.run_script(self.instance, self.profile['username'], script):
+                if not spt.run_script(self.instance, self.profile['username'], script, cmd=cmd):
                     break
             except Exception as e: 
                 print(str(e))
@@ -188,7 +193,7 @@ class spotted:
         print('Time to Run Scripts: %s' % str(time.time()-st))
 
     def open_shell(self, port=22):
-        '''Open an active shell'''
+        '''Open an active shell. --Only works when run from the command prompt--'''
         spt.active_shell(self.instance, self.profile['username'])
     
     def terminate(self): 
