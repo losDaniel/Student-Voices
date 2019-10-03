@@ -124,8 +124,9 @@ class spotted:
         print('#~#~#~#~#~#~#~# Spot Instance: '+self.name, flush=True)
         print('#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#', flush=True)
         print('', flush=True)
-
         print(self.profile)
+        print('')
+
         try:                                     # Launch or connect to the spot instance under the given name
             # Returns the profile with any parameters that needed to be added automatically in order to connect (Key Pair and Security Group)                                                                 
             self.instance, self.profile = spt.launch_spot_instance(self.name, self.profile, self.monitoring)   
@@ -174,6 +175,28 @@ class spotted:
         spt.upload_to_ec2(self.instance, self.profile['username'], files_to_upload, remote_dir=remotepath)    
     
         print('Time to Upload: %s' % str(time.time()-st))
+        
+    def download(self, files, remotepath):
+        '''
+        Upload a file or list of files to the instance. If an EFS is connected to the instance files can be uploaded to the EFS through the instnace. 
+        __________
+        parameters
+        - files : str or list of str. file or list of files to upload
+        - remotepath : str. path to upload files to, only one path can be specified. 
+        '''
+        if type(files)==str:
+            files=[files]
+        elif type(files)!=list: 
+            raise TypeError('Files must but type str or list')
+
+        st = time.time() 
+            
+        files_to_download = [] 
+        for file in files:
+            files_to_download.append(os.path.abspath(file))
+        #spt.upload_to_ec2(self.instance, self.profile['username'], files_to_upload, remote_dir=remotepath)    
+    
+        print('Time to Upload: %s' % str(time.time()-st))
 
     def run(self, scripts, cmd=False):
         '''
@@ -203,7 +226,7 @@ class spotted:
         print('Time to Run Scripts: %s' % str(time.time()-st))
 
     def open_shell(self, port=22):
-        '''Open an active shell'''
+        '''Open an active shell. --Only works when run from the command prompt--'''
         spt.active_shell(self.instance, self.profile['username'])
     
     def terminate(self): 
