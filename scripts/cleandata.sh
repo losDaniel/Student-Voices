@@ -9,7 +9,7 @@ cd scripts
 cd scripts 
 
 # Run the modeling tools script for a preliminary setup 
-# python modeling_tools.py
+python modeling_tools.py
 
 # Pull the arguments to pass to the command and save the log 
 ARG=$1
