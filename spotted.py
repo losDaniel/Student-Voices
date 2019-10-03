@@ -143,21 +143,27 @@ class spotted:
         __________
         parameters
         - files : str or list of str. file or list of files to upload
-        - remotepath : str. path to upload files to, only one path can be specified. 
+        - remotepath : str or list of str. path to upload files to, only one path can be specified. 
         '''
-        if type(files)==str:
-            files=[files]
+        if type(files)==str: 
+            files = [files]
         elif type(files)!=list: 
-            raise TypeError('Files must but type str or list')
+            raise TypeError('get must be str or list of str')
+        if type(remotepath) is str: 
+            remotepath = [remotepath]*len(files)
+        elif type(remotepath)==list: 
+            assert(len(remotepath)==len(files))
+        else: 
+            raise TypeError('put must be str or list of str with equal length to `get`')
 
         st = time.time() 
             
         files_to_download = [] 
         for file in files:
-            files_to_download.append(os.path.abspath(file))
-        #spt.upload_to_ec2(self.instance, self.profile['username'], files_to_upload, remote_dir=remotepath)    
+            files_to_download.append(file)
+        spt.download_from_ec2(self.instance, self.profile['username'], files_to_download, put=remotepath)
     
-        print('Time to Upload: %s' % str(time.time()-st))
+        print('Time to Download: %s' % str(time.time()-st))
 
     def run(self, scripts, cmd=False):
         '''

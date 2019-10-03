@@ -28,7 +28,6 @@ MIT License
 import spot_toolbox as spt
 import argparse, sys, time, os
 
-
 if __name__ == '__main__':                                                     # Main execution 
     
     profiles={
