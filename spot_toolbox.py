@@ -27,7 +27,13 @@ except:
     pip._internal.main(['install', 'boto3'])
     import boto3    
     
-import time, os, sys, interactive
+import time, os, sys, interactive, ast
+
+
+def load_profiles():
+    with open('profiles.txt','r') as f:
+        profiles = ast.literal_eval(f.read())
+    return profiles
 
 def launch_spot_instance(spotid, profile, monitoring=True, spot_wait_sleep=5, instance_wait_sleep=5, key_pair_dir=os.getcwd(), enable_nfs=True, enable_ds=True):
     '''

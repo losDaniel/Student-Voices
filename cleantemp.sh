@@ -17,7 +17,7 @@ python modeling_tools.py
 # nohup python cleaning.py -c $ARG -o True &> $TXTFILE &
 
 # Rigged to run with notebook
-nohup python cleaning.py -c B1 -o True &> clean_B1.txt &
+nohup python cleaning.py -c A1 -o True &> clean_A1.txt &
 curpid=$!
 
 # Wait until the previous job is done and then shutdown the instance 

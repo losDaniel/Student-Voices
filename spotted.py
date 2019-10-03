@@ -9,44 +9,7 @@ import sys, time, os
 
 class spotted: 
     
-    profiles={
-            "default": {'firewall_ingress': ('tcp', 22, 22, '0.0.0.0/0'),      # Must define a firewall ingress rule in order to connect to an instance 
-                        'image_id':'ami-0859ec69e0492368e',                    # Image ID from AWS. go to the launch-wizard to get the image IDs or use the boto3 client.describe_images() with Owners of Filters parameters to reduce wait time and find what you need.
-                        'instance_type':'t2.micro',                            # Get a list of instance types and prices at https://aws.amazon.com/ec2/spot/pricing/ 
-                        'price':'0.004',
-                        'region':'us-west-2',                                  # All settings for us-west-2. Parameters (including prices) can change by region, make sure to review all parameters if changing regions.  
-                        'scripts':[],                            
-                        'username':'ec2-user',                                 # This will usually depend on the operating system of the image used. For a list of operating systems and defaul usernames check https://alestic.com/2014/01/ec2-ssh-username/
-                        'efs_mount':True                                       # If true will check for an EFS mount in the instance and if one is not found it will create a file system or use an existing one and mount it. 
-                        },
-            "datasync":{'firewall_ingress': ('tcp', 22, 22, '0.0.0.0/0'),      # must enable nfs, http and other port ingress depending on endpoints https://docs.aws.amazon.com/datasync/latest/userguide/requirements.html#datasync-network
-                        'image_id':'ami-0f2e06a04ee62ab37',                    # Datasync Image ID from AWS. List by region at https://docs.aws.amazon.com/datasync/latest/userguide/deploy-agents.html#ec2-deploy-agent 
-                        'instance_type':'m5.2xlarge',                          # For recommended instance types for datasync https://docs.aws.amazon.com/datasync/latest/userguide/requirements.html#ec2-instance-types
-                        'price': '0.15',                                       # Spot instance pricing list at https://aws.amazon.com/ec2/spot/pricing/ 
-                        'region':'us-west-2',                                  # All settings for us-west-2. Datasync images vary by region, review all parameters if using a different region
-                        'scripts':[],
-                        'username':'ec2-user',
-                        'efs_mount':False                                      # No need to mount an EFS on a datasync agent (ec2 Instance with a datasync image)
-                        },
-            "cleaning1":{'firewall_ingress': ('tcp', 22, 22, '0.0.0.0/0'),     
-                        'image_id':'ami-0859ec69e0492368e',                    
-                        'instance_type':'c5.4xlarge',                          # VCPU Compute Optimized Instance for data cleaning, bigger chip/more memory -> faster cleaning                     
-                        'price':'0.30',
-                        'region':'us-west-2',                                  
-                        'scripts':[],                            
-                        'username':'ec2-user',                                 
-                        'efs_mount':True                                     
-                        },
-            "ldamodel1":{'firewall_ingress': ('tcp', 22, 22, '0.0.0.0/0'),     
-                        'image_id':'ami-0859ec69e0492368e',                    
-                        'instance_type':'c5d.9xlarge',                          # VCPU Compute Optimized Instance for data cleaning, bigger chip/more memory -> faster cleaning                     
-                        'price':'0.60',
-                        'region':'us-west-2',                                  
-                        'scripts':[],                            
-                        'username':'ec2-user',                                 
-                        'efs_mount':True                                     
-                        },
-    }       
+    profiles=spt.load_profiles()         
     
     def __init__(self,
                  name,
