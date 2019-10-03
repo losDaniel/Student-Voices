@@ -453,7 +453,7 @@ def download_from_ec2(instance, username, files, remote_dir, local_dir='.'):
     
     
     client = boto3.client('ec2', region_name='us-west-2')
-    client = sc.connect_to_instance(instance['PublicIpAddress'],instance['KeyName'],username=username,port=22)
+    client = connect_to_instance(instance['PublicIpAddress'],instance['KeyName'],username=username,port=22)
 
 
 

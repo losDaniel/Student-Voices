@@ -46,37 +46,23 @@ class spotted:
                         'username':'ec2-user',                                 
                         'efs_mount':True                                     
                         },
-    }     
-
-    name=''
-    profile={}
-    monitoring=True
-    filesystem=''
-    efs_mount=True
-    newmount=''
-    firewall=()
-    image_id=''
-    price=''
-    region=''
-    username=''
-    key_pair=''
-    sec_group=''    
+    }       
     
     def __init__(self,
                  name,
-                 profile='default',
-                 monitoring=True,
-                 filesystem='',
-                 efs_mount=True,
-                 newmount='',
-                 firewall=(),
-                 image_id='',
-                 instance_type='',
-                 price='',
-                 region='',
-                 username='',
-                 key_pair='',
-                 sec_group=''):
+                 profile=None,
+                 monitoring=None,
+                 filesystem=None,
+                 efs_mount=None,
+                 newmount=None,
+                 firewall=None,
+                 image_id=None,
+                 instance_type=None,
+                 price=None,
+                 region=None,
+                 username=None,
+                 key_pair=None,
+                 sec_group=None):
         '''
         A class to run, control and interact with spot instances. 
         __________
@@ -95,28 +81,40 @@ class spotted:
         '''
 
         self.name=name 
-        self.profile=spotted.profiles[profile] 
-        self.monitoring=monitoring
-        self.filesystem=filesystem
-        self.newmount=newmount        
+        if profile is None: 
+            self.profile=spotted.profiles['default'] 
+        else: 
+            self.profile=profile 
+        if monitoring is None: 
+            self.monitoring=True
+        else: 
+            self.monitoring=monitoring
+        if filesystem is None: 
+            self.filesystem=''
+        else:
+            self.filesystem=filesystem
+        if newmount is None:   
+            self.newmount=False
+        else:              
+            self.newmount=newmount        
         
-        if not efs_mount: 
+        if efs_mount is not None: 
             self.profile['efs_mount']=efs_mount
-        if firewall!=():
+        if firewall is not None:
             self.profile['firewall']=firewall
-        if image_id!='':
+        if image_id is not None:
             self.profile['image_id']=image_id
-        if instance_type!='':
+        if instance_type is not None:
             self.profile['instance_type']=instance_type
-        if str(price)!='':
+        if price is not None:
             self.profile['price']=price
-        if region!='':
+        if region is not None:
             self.profile['region']=region
-        if username!='':
+        if username is not None:
             self.profile['username']=username
-        if key_pair!='': 
+        if key_pair is not None:
             self.profile['key_pair']=profile
-        if sec_group!='':
+        if sec_group is not None:
             self.profile['security_group']=sec_group                           
                
         print('', flush=True)
