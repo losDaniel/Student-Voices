@@ -1,12 +1,12 @@
 import os, time, sys, argparse
 import utils as bn 
 import modeling_tools as mt 
-import pip._internal
-try:
-    import pandas as pd 
-except:
-    pip._internal.main(['install', 'pandas'])
-    import pandas as pd 
+# import pip._internal
+# try:
+#     import pandas as pd 
+# except:
+#     pip._internal.main(['install', 'pandas'])
+#     import pandas as pd 
 
 
 def gen_data():
