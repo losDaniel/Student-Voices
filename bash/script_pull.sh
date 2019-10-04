@@ -12,5 +12,5 @@ echo scripts/ >> .git/info/sparse-checkout
 git remote add -f origin https://github.com/losDaniel/Student-Voices.git
 
 # Select the branch you want to update with 
-git checkout deagreggating_results
+git checkout cleaning_script
 git pull origin
