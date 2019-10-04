@@ -11,6 +11,7 @@ import re
 import numpy as np
 import random 
 from sklearn.decomposition import PCA
+import pip._internal
 
 try:
     import pyLDAvis
@@ -130,7 +131,7 @@ def save_topic_visualization(model, docs, dic, path):
         pyLDAvis.save_html(lda_vis, path)
     except Exception as e: 
         print(str(e))
-        print('Make sure you are entering a valid path with the .html extension')
+        raise('Make sure you are entering a valid path with the .html extension')
 
 
         

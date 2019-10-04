@@ -19,7 +19,7 @@ python lda_analysis.py
 # nohup sudo python lda_modeling.py -c $CON -s $SET &> $TXTFILE &
 # curpid=$!
 
-nohup sudo python lda_modeling.py -c A1 -s LDA1 &> lda_A1_LDA1.txt &
+nohup python lda_modeling.py -c A1 -s LDA1 &> lda_A1_LDA1.txt &
 curpid=$!
 
 # Wait until the previous job is done and then shutdown the instance 

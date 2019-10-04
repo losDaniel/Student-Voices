@@ -1,6 +1,7 @@
-import os, random, argparse
+import os, random, argparse, re
 import pip._internal
 import utils as bn 
+import visuals as vs 
 import lda_analysis as ld 
 try:
     import numpy as np 
@@ -133,43 +134,75 @@ def lda_parameters_hardcodes(ranges):
 
 
 
-def gen_lda_results(rng, setting, text, data, range_indices, lda_parameters, coherence_guide, models_dir, name):
-    # get the rows in the data that you need 
-    indices = data.loc[range_indices[rng],'Review_Length']
-
-    filtered_index = indices[indices>lda_parameters[setting][rng]['review_length']].index
+def gen_lda_results(rng, setting, config, text, full_text, data, range_indices, lda_parameters, coherence_guide, models_dir, num_words=20):
+    '''
+    Generate the LDA Results: trained models, coherence scores, bubble graphs and topic assignment for documents
+    '''
+    
+    run_name = setting+'_'+config                                                  # we will create results saving for each 
+    name = setting+'_'+config+'_'+rng                
+    
+    indices = data.loc[range_indices[rng],'Review_Length']                                  # get the review length of the rows in range 
+    filtered_index = indices[indices>lda_parameters[setting][rng]['review_length']].index   # filter it down by review length 
     print('Filtered the index for review length', flush=True)
     
-    docs = [text[idx] for idx in filtered_index]
-    print('Retrieved the filtered documents, length is:', flush=True)
-    print(len(docs), flush=True)
-    # save additional info to for the experimental record 
-    lda_parameters[setting][rng]['filtered_length'] = len(docs)
-    lda_parameters[setting][rng]['setting'] = setting
+    docs = [text[idx] for idx in filtered_index]                                            # get the documents that remain
+    print('Retrieved the filtered documents, length is: '+str(len(docs)), flush=True)
 
-    # if all the LDA models have been trained this will just load them and return the other materials 
-    trained_models, corpus, dictionary, duration = ld.run_lda(docs,
-                                                      lda_parameters[setting][rng],
+    lda_parameters[setting][rng]['filtered_length'] = len(docs)                            # save the length of the results docs 
+    lda_parameters[setting][rng]['setting'] = setting                                      # add the setting to the lda parameters for internal reference
+
+    trained_models, corpus, dictionary, duration = ld.run_lda(docs,                        # train the lda models
+                                                      lda_parameters[setting][rng],        # if all the LDA models have been trained this will just load them and return the other materials 
                                                       models_dir,
                                                       name)
 
     if 'duration' not in lda_parameters[setting][rng]: lda_parameters[setting][rng]['duration']=duration
 
-    print('Determining coherence scores...')
-    # get the ranked coherence models and the coherence
-    ranked, coherences = ld.determine_coherence(trained_models, dictionary, docs)
+    get_coherence=True
+    if 'coherence_scores' in lda_parameters[setting][rng]:
+        try:
+            assert rng in coherence_guide
+            assert config in coherence_guide[rng]
+            assert setting in coherence_guide[rng][config]
+            get_coherence=False            
+            print('Coherence already estimated.', flush=True)            
+        except:
+            print('Coherence Guide and LDA parameters not in sync. Getting coherece...', flush=True)
+    if get_coherence: 
+        print('Determining coherence scores...')
+        ranked, coherences = ld.determine_coherence(trained_models, dictionary, docs)          # get the ranked coherence models and the individual model's coherence scores 
+        if rng not in coherence_guide: coherence_guide[rng]={}                                 # store the full coherence scores per topic in a separate dictionary object
+        if config not in coherence_guide[rng]: coherence_guide[rng][config]={}                 
+        if setting not in coherence_guide[rng][config]: coherence_guide[rng][config][setting]={}
+    
+        coherence_guide[rng][config][setting] = [(k,coherences[k]) for k in coherences]        # save results into the coherence guide  
+        lda_parameters[setting][rng]['coherence_scores'] = ranked                              # save another copy to the LDA results 
 
-    # store the full coherence scores per topic in a separate dictionary object
-    if rng not in coherence_guide: coherence_guide[rng]={} 
-    if config not in coherence_guide[rng]: coherence_guide[rng][config]={}
-    if setting not in coherence_guide[rng][config]: coherence_guide[rng][config][setting]={}
+        bn.full_pickle(os.getcwd()+'/results/coherence_scores_'+run_name, coherence_guide)
+        print('Coherence Scores Saved.', flush=True)                           
+        
+        bn.full_pickle(os.getcwd()+'/results/lda_parameters_'+run_name, lda_parameters) 
+        print('LDA Parameters Saved.', flush=True)
 
-    coherence_guide[rng][config][setting] = [(k,coherences[k]) for k in coherences]
+    fulldocs = [full_text[idx] for idx in filtered_index]                                  # get the full documents     
+    # get the ranked models and their scores in a list of tuples
+    coherence_scores=list(zip(re.findall('[0-9]+\.*[0-9]*', lda_parameters[setting][rng]['coherence_scores'])[::2],                   
+                              re.findall('[0-9]+\.*[0-9]*', lda_parameters[setting][rng]['coherence_scores'])[1::2]))
 
-    # save the coherence scores to the experimental register
-    lda_parameters[setting][rng]['coherence_scores'] = ranked
+    best_topic_num = int(coherence_scores[0][0])                                           # get the topic num with the top coherence score 
+    model = trained_models[best_topic_num]                                                 # get the most coherent model 
 
-    return trained_models, corpus, dictionary, lda_parameters, coherence_guide
+    # specify paths to save the results  
+    lda_viz_path = os.getcwd()+'/graphs/LDA Graphs/Viz_'+rng+'_'+str(best_topic_num)+'_'+setting+'_'+config+'.html'
+    topic_des_path = os.getcwd()+'/results/LDA Descriptions/Des_'+rng+'_'+str(best_topic_num)+'_'+setting+'_'+config+'.csv'
+    topic_vec_path = os.getcwd()+'/results/LDA Distributions/Vec_'+rng+'_'+str(best_topic_num)+'_'+setting+'_'+config # no extension because we will compress
+    
+    vs.save_topic_visualization(model, docs, dictionary, lda_viz_path)                     # create and save the topic pyLDAvis HTML topic visualization     
+    ld.write_lda_descriptions(topic_des_path, model, num_words)                            # save the top words for each topic and their coefficients 
+    ld.get_sentence_topics(model, corpus, fulldocs, path=topic_vec_path)                   # get main topic in each document
+
+    return lda_parameters, coherence_guide
 
 
 
@@ -195,13 +228,13 @@ if __name__ == '__main__':
     
     print('Importing Rating Ranges...', flush=True)
     range_indices = bn.decompress_pickle(os.getcwd() + '/data/by_rating_range.pbz2')
-    ranges = list(np.sort(list(range_indices.keys())))                         # create a list of each range 
+    ranges = list(np.sort(list(range_indices.keys())))                                     # create a list of each range 
 
     print('Loading Statistics Data...', flush=True)
-    data = bn.decompress_pickle(os.getcwd()+'/data/review_stats.pbz2')         # load the review statistics dataset 
+    data = bn.decompress_pickle(os.getcwd()+'/data/review_stats.pbz2')                     # load the review statistics dataset 
 
     print('Loading Full Text Data...', flush=True)
-    full_text = bn.decompress_pickle(os.getcwd()+'/data/full_review_text.pbz2')# load the full text so we can pull sample reviews 
+    full_text = bn.decompress_pickle(os.getcwd()+'/data/full_review_text.pbz2')            # load the full text so we can pull sample reviews 
 
     #~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#
     #~#~# Create  Directories #~#~#~#
@@ -230,26 +263,26 @@ if __name__ == '__main__':
     #~#~#~#~#~#~#~#~#~#~#
 
     print('Beginning modeling...', flush=True)
-    for config in data_configurations:                                         # Load each configuration 
+    for config in data_configurations:                                                     # Load each configuration 
         
         # load the cleaned text data
         print('Loading data...', flush=True)
         text, stem_map, lemma_map, phrase_frequencies = bn.decompress_pickle(os.getcwd()+'/data/cleaned_data/cleaned_docs_'+config+'.pbz2')
 
-        for setting in settings_to_run:                                        # Load each setting 
+        for setting in settings_to_run:                                                    # Load each setting 
                                                                                
-            model_directory = os.getcwd()+'/models/'+setting+'_'+config        # Each config-setting will have its own model folder 
-            if not os.path.exists(model_directory):                            # Check if the folder exists for this config-setting pair 
+            model_directory = os.getcwd()+'/models/'+setting+'_'+config                    # Each config-setting will have its own model folder 
+            if not os.path.exists(model_directory):                                        # Check if the folder exists for this config-setting pair 
                 print('Model directory not detected. Creating...', flush=True) 
-                os.mkdir(model_directory)                                      # If it does not create it 
+                os.mkdir(model_directory)                                                  # If it does not create it 
             else: 
                 print('Model directory detected...', flush=True)                
 
             #~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#
             #~#~# Load Results Progress #~#~#~#
             #~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#~#
-                                                                               # Since each setting config can be run on separate nodes 
-            run_name = setting+'_'+config                                      # we will create results saving for each 
+                                                                                           # Since config-setting pairs can be run on separate instances 
+            run_name = setting+'_'+config                                                  # we will create results saving for each 
 
             # load the hardcoded lda parameters dictionaries, if a results updated version exists load that
             if os.path.exists(os.getcwd()+'/results/lda_parameters_'+run_name+'.pickle'):
@@ -274,25 +307,20 @@ if __name__ == '__main__':
                 if 'coherence_scores' not in lda_parameters[setting][rng]:
                     
                     print(str(rng)+' '+str(setting)+' '+str(config), flush=True)
-                    
                     name = setting+'_'+config+'_'+rng                
-                    # set the configuration for this lda_parameter setting and range
-                    lda_parameters[setting][rng]['data_configuration'] = config
+                    lda_parameters[setting][rng]['data_configuration'] = config            # set the configuration for this lda_parameter setting and range
     
-                    # train models or load the ones that have already been trained 
-                    trained_models,corpus,dictionary,lda_parameters,coherence_guide=gen_lda_results(rng,
-                                                                                                    setting,
-                                                                                                    text,
-                                                                                                    data,
-                                                                                                    range_indices,   
-                                                                                                    lda_parameters,
-                                                                                                    coherence_guide,
-                                                                                                    model_directory, 
-                                                                                                    name)
-                    # save any progress on coherence scores
-                    bn.full_pickle(os.getcwd()+'/results/coherence_scores_'+run_name, coherence_guide)
-                    print('Coherence Scores Saved.', flush=True)
+                    lda_parameters, coherence_guide = gen_lda_results(rng,                 # train models or load the ones that have already been trained 
+                                                                      config,
+                                                                      setting,
+                                                                      text,
+                                                                      data,
+                                                                      range_indices,   
+                                                                      lda_parameters,
+                                                                      coherence_guide,
+                                                                      model_directory)
+         
+                    print('Results have been saved. Analysis of '+name+' complete.', flush=True)
+
                     
-                    # save any progress on the lda parameters
-                    bn.full_pickle(os.getcwd()+'/results/lda_parameters_'+run_name, lda_parameters)
-                    print('LDA Parameters Saved.', flush=True)
+                    

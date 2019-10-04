@@ -369,7 +369,7 @@ def setup_text_training_data(docs, none_below, not_above):
 
 # Setup dictionaries 
 def set_dictionary(docs, nb=30, na=0.5):
-    print(docs[0], flush=True)
+
     dictionary = Dictionary(docs)
     print('Length of the dictionary is %s' % str(len(dictionary)), flush=True)
 
@@ -378,7 +378,7 @@ def set_dictionary(docs, nb=30, na=0.5):
 
     # vectorize the docs by creating bag-of-words representations of the documents.
     corpus = [dictionary.doc2bow(doc) for doc in docs]
-    print('Done filtering (in)frequent words', flush=True) 
+    print('Done applying word frequency rules', flush=True) 
     print('Length of the corpus is %s' % str(len(corpus)), flush=True)
     print('Length of the dictionary is %s' % str(len(dictionary)), flush=True)
 
@@ -391,6 +391,7 @@ def set_dictionary(docs, nb=30, na=0.5):
     for ids in id2word: 
         word2id[id2word[ids]] = ids
 
+    # We create the literal dictionary for the  setup_text_training_data method 
     # create a list with all the words in the finalized dictionary
     literal_dictionary = [dictionary[i] for i in dictionary]
 

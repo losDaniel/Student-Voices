@@ -60,7 +60,8 @@ def train_ldas(docs, passes, ntrange, id2word, models_dir, name, cores = cpu_cou
 
         model_path = os.path.join(models_dir, name + '%d.lda' % num_topics)
 
-        if not os.path.exists(model_path):            
+        if not os.path.exists(model_path): 
+            start = time.time()
             # train the model on multiple cores        
             lda = models.LdaMulticore(
                 corpus = docs, id2word = id2word, num_topics = num_topics, 
@@ -73,6 +74,8 @@ def train_ldas(docs, passes, ntrange, id2word, models_dir, name, cores = cpu_cou
 
             # add it to the dictionary of trained models 
             trained_models[num_topics] = lda
+            dur = time.time() - start
+            print('Training the model '+name+' took '+str(dur), flush=True)
 
         else: 
             # load the saved model
@@ -123,11 +126,15 @@ def determine_coherence(trained_models, dictionary, docs):
     # This performs a single pass over the reference corpus, accumulating
     # the necessary statistics for all of the models at once.
     print('Estimating coherence for the models...', flush=True)
+    start=time.time()
     cm = models.CoherenceModel.for_models(
         trained_models.values(), dictionary = dictionary, texts=docs, coherence='c_v')
+    print('Finished in %s' % str(time.time()-start), flush=True)
 
     print('Comparing the models...', flush=True)
+    start=time.time()
     coherence_estimates = cm.compare_models(trained_models.values())
+    print('Finished in %s' % str(time.time()-start), flush=True)
 
     coherences = dict(zip(trained_models.keys(), coherence_estimates))
 
@@ -138,6 +145,7 @@ def determine_coherence(trained_models, dictionary, docs):
 
 
 def write_lda_descriptions(topic_des_path, model, num_words):
+    '''Write out the Key Words for each topic'''
     with open(topic_des_path,'w') as f:
         for t in range(0,model.num_topics):
             f.write('\ntopic {} words: ,'.format(t) + ', '.join([w[0] for w in model.show_topic(t, num_words)]))
