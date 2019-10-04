@@ -32,6 +32,7 @@ try:
 except:
     pip._internal.main(['install', 'seaborn'])
     import seaborn as sns
+
 try:
     from pyvis.network import Network
 except:
