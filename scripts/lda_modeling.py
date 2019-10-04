@@ -1,4 +1,4 @@
-import os, random, argparse, re
+import os, random, argparse, re, time
 import pip._internal
 import utils as bn 
 import visuals as vs 
@@ -198,9 +198,17 @@ def gen_lda_results(rng, setting, config, text, full_text, data, range_indices, 
     topic_des_path = os.getcwd()+'/results/LDA Descriptions/Des_'+rng+'_'+str(best_topic_num)+'_'+setting+'_'+config+'.csv'
     topic_vec_path = os.getcwd()+'/results/LDA Distributions/Vec_'+rng+'_'+str(best_topic_num)+'_'+setting+'_'+config # no extension because we will compress
     
+    st=time.time()
     vs.save_topic_visualization(model, docs, dictionary, lda_viz_path)                     # create and save the topic pyLDAvis HTML topic visualization     
+    print('Completed Visualizations in %s' % str(time.time()-st), flush=True)
+
+    st=time.time()
     ld.write_lda_descriptions(topic_des_path, model, num_words)                            # save the top words for each topic and their coefficients 
+    print('Completed Recording Key Words in %s' % str(time.time()-st), flush=True)
+
+    st=time.time()
     ld.get_sentence_topics(model, corpus, fulldocs, path=topic_vec_path)                   # get main topic in each document
+    print('Completed Recording Sentence Topics in %s' % str(time.time()-st), flush=True)
 
     return lda_parameters, coherence_guide
 
