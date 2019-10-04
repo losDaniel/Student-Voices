@@ -15,6 +15,8 @@ pip install nltk
 pip install gensim
 pip install sklearn
 pip install pandas
+pip install pyLDAvis
+pip install pyvis
 
 # Create the directories and subdirectories we needs 
 mkdir data

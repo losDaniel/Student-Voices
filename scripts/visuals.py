@@ -37,7 +37,6 @@ try:
     from pyvis.network import Network
 except:
     pip._internal.main(['install', 'pyvis'])
-    print("WHAT THE FUCK", flush=True)
     from pyvis.network import Network
 
 # Change the directory to the home directory. 
