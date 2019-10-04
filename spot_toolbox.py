@@ -197,6 +197,7 @@ def launch_spot_instance(spotid, profile, monitoring=True, spot_wait_sleep=5, in
         raise Exception('Request not submitted')
 
     print('Got instance: '+str(instance['InstanceId'])+'['+str(instance['State']['Name'])+']')
+    sys.stdout.flush() 
     attempt = 0 
     instance_up = False
     while not instance_up:
@@ -207,7 +208,7 @@ def launch_spot_instance(spotid, profile, monitoring=True, spot_wait_sleep=5, in
             instance_up=True        
         else:
             if attempt==0:
-                sys.stdout.write('Waiting for instance to boot...')   
+                sys.stdout.write('\nWaiting for instance to boot...')   
                 sys.stdout.flush()  
             time.sleep(instance_wait_sleep)
             attempt+=1 
