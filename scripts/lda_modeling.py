@@ -317,11 +317,12 @@ if __name__ == '__main__':
                     print(str(rng)+' '+str(setting)+' '+str(config), flush=True)
                     name = setting+'_'+config+'_'+rng                
                     lda_parameters[setting][rng]['data_configuration'] = config            # set the configuration for this lda_parameter setting and range
-    
+        
                     lda_parameters, coherence_guide = gen_lda_results(rng,                 # train models or load the ones that have already been trained 
-                                                                      config,
                                                                       setting,
+                                                                      config,
                                                                       text,
+                                                                      full_text,
                                                                       data,
                                                                       range_indices,   
                                                                       lda_parameters,
