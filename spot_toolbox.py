@@ -183,7 +183,8 @@ def launch_spot_instance(spotid, profile, monitoring=True, spot_wait_sleep=5, in
                 time.sleep(spot_wait_sleep)
         else: 
             if attempt==0:
-                print('>> Launching...')
+                print('Launching...')
+                sys.stdout.flush() 
             sys.stdout.write(".")
             sys.stdout.flush()                                                 # If a new spot request was submitted it may take a moment to register
             time.sleep(spot_wait_sleep)                                        # Wait and attempt to connect again 

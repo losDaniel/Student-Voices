@@ -32,11 +32,10 @@ try:
 except:
     pip._internal.main(['install', 'seaborn'])
     import seaborn as sns
-
 try:
     from pyvis.network import Network
 except:
-    pip._internal.main(['install', 'seaborn'])
+    pip._internal.main(['install', 'pyvis'])
     from pyvis.network import Network
 
 # Change the directory to the home directory. 
