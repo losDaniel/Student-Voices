@@ -235,7 +235,7 @@ def connect_to_instance(ip, keyfile, username='ec2-user', port=22, timeout=10):
     k = paramiko.RSAKey.from_private_key_file(keyfile+'.pem')                  # Create an RSA key from the key file to avoid runtime 
     retries = 0 
     connected = False 
-    sys.stdout.write('>> Connecting...')
+#    sys.stdout.write('>> Connecting...')
     sys.stdout.flush() 
     while connected==False: 
         try:
@@ -249,7 +249,7 @@ def connect_to_instance(ip, keyfile, username='ec2-user', port=22, timeout=10):
             sys.stdout.flush() 
             if retries>=5: 
                 raise e  
-    sys.stdout.write('..Connected\n')
+#    sys.stdout.write('..Connected\n')
     return ssh_client
 
 
