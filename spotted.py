@@ -5,12 +5,12 @@ Created on Tue Oct  1 12:56:39 2019
 @author: carlo
 """
 import spot_toolbox as spt
-import sys, time, os
+import sys, time, os, copy
 
 class spotted: 
     
     profiles=spt.load_profiles()         
-    
+   
     def __init__(self,
                  name,
                  profile=None,
@@ -45,9 +45,9 @@ class spotted:
 
         self.name=name 
         if profile is None: 
-            self.profile=spotted.profiles['default'] 
+            self.profile=copy.deepcopy(spotted.profiles['default'])            # create a deep copy so that the class dictionary doesn't get modified  
         else: 
-            self.profile=spotted.profiles[profile] 
+            self.profile=spotted.profiles[profile]
         if monitoring is None: 
             self.monitoring=True
         else: 
