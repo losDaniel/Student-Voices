@@ -35,4 +35,13 @@
                 'username':'ec2-user',                                 
                 'efs_mount':True                                     
                 },
+    "lda2":{'firewall_ingress': ('tcp', 22, 22, '0.0.0.0/0'),     
+                'image_id':'ami-0859ec69e0492368e',                    
+                'instance_type':'c5.12xlarge', 
+                'price':'0.80',
+                'region':'us-west-2',                                  
+                'scripts':[],                            
+                'username':'ec2-user',                                 
+                'efs_mount':True                                     
+                },    
 }  
