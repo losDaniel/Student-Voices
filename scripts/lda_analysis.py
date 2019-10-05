@@ -7,8 +7,8 @@ import multiprocessing
 from collections import OrderedDict
 from gensim import models
 
-cpu_count = multiprocessing.cpu_count()
-print("Available Cores: %d" % cpu_count)
+cpu_count = multiprocessing.cpu_count()-1
+print("Will use %d of the available cores:" % cpu_count)
 
 # Home directory for the AWS instance
 os.chdir("/home/ec2-user/efs")
