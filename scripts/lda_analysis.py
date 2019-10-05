@@ -1,6 +1,7 @@
 import utils as bn
 import os
 import time
+import logging
 import pandas as pd
 import modeling_tools as mt
 import multiprocessing
@@ -42,8 +43,10 @@ def run_lda(docs, params, models_dir, name):
     return trained_models, corpus, dictionary, duration
 
 
+
+
 # Train LDA topic models 
-def train_ldas(docs, passes, ntrange, id2word, models_dir, name, cores = cpu_count):
+def train_ldas(docs, passes, ntrange, id2word, models_dir, name, cores = cpu_count, log=True):
     '''
     MultiTrain LDA clusters with a range of ntrange clusters and return a dictionary of models
     docs - list of documents in bag of words format 
@@ -63,10 +66,16 @@ def train_ldas(docs, passes, ntrange, id2word, models_dir, name, cores = cpu_cou
         if not os.path.exists(model_path): 
             print('Training '+name+' with '+str(num_topics)+' topics', flush=True)
             start = time.time()
+
+            # use the logging model to log gensim model convergence 
+            logging.basicConfig(filename='gensim_'+name+'.log',
+                    format="%(asctime)s:%(levelname)s:%(message)s",
+                    level=logging.INFO)
+
             # train the model on multiple cores        
             lda = models.LdaMulticore(
                 corpus = docs, id2word = id2word, num_topics = num_topics, 
-                workers = cores, passes=passes, random_state = 2, eval_every = 1,
+                workers = cores, passes=passes, random_state = 2, eval_every = 10,
                 alpha = 'asymmetric',
                 decay=0.5, offset=64  # best params from Hoffman paper
             )         

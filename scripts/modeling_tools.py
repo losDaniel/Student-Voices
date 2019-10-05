@@ -53,7 +53,7 @@ except:
     pip._internal.main(['install','TextBlob'])
     from textblob import TextBlob
 
-cpu_count = multiprocessing.cpu_count()
+cpu_count = multiprocessing.cpu_count()-1
 
 # rootpath for the AWS directory 
 os.chdir("/home/ec2-user/efs")
