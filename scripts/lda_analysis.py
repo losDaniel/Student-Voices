@@ -61,6 +61,7 @@ def train_ldas(docs, passes, ntrange, id2word, models_dir, name, cores = cpu_cou
         model_path = os.path.join(models_dir, name + '%d.lda' % num_topics)
 
         if not os.path.exists(model_path): 
+        	print('Training '+name+' with '+str(num_topics)+' topics', flush=True)
             start = time.time()
             # train the model on multiple cores        
             lda = models.LdaMulticore(
@@ -75,11 +76,12 @@ def train_ldas(docs, passes, ntrange, id2word, models_dir, name, cores = cpu_cou
             # add it to the dictionary of trained models 
             trained_models[num_topics] = lda
             dur = time.time() - start
-            print('Training the model '+name+' took '+str(dur), flush=True)
+            print('Complete after '+str(dur)+' seconds', flush=True)
 
         else: 
             # load the saved model
             trained_models[num_topics] = models.LdaMulticore.load(model_path)
+        	print('model '+name+' with '+str(num_topics)+' topics loaded', flush=True)
 
     return trained_models
 
