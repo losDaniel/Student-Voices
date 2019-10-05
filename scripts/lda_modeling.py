@@ -186,11 +186,8 @@ def gen_lda_results(rng, setting, config, text, full_text, data, range_indices, 
         print('LDA Parameters Saved.', flush=True)
 
     fulldocs = [full_text[idx] for idx in filtered_index]                                  # get the full documents     
-    # get the ranked models and their scores in a list of tuples
-    coherence_scores=list(zip(re.findall('[0-9]+\.*[0-9]*', lda_parameters[setting][rng]['coherence_scores'])[::2],                   
-                              re.findall('[0-9]+\.*[0-9]*', lda_parameters[setting][rng]['coherence_scores'])[1::2]))
 
-    best_topic_num = int(coherence_scores[0][0])                                           # get the topic num with the top coherence score 
+    best_topic_num = int(lda_parameters[setting][rng]['coherence_scores'][0][0])           # get the topic num with the top coherence score 
     model = trained_models[best_topic_num]                                                 # get the most coherent model 
 
     # specify paths to save the results  
