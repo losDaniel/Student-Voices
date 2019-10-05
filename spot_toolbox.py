@@ -283,8 +283,7 @@ def run_script(instance, user_name, script, cmd=False, port=22):
             print(line.rstrip(), flush=True)                                   # Show the output 
     except (KeyboardInterrupt, SystemExit):
         print(sys.stderr, 'Ctrl-C, stopping', flush=True)                      # Keyboard interrupt 
-    client.close()                                                             # Close the connection 
-    session.exit_status_ready()
+    client.close()                                                             # Close the connection    
     
     return True
 

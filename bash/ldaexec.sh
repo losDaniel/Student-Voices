@@ -23,5 +23,4 @@ nohup python lda_modeling.py -c DC_CONFIG -s SETTING &> OUTFILE &
 curpid=$! 
 
 # Wait until the previous job is done and then shutdown the instance 
-nohup sh -c 'while ps -p $0 &> /dev/null; do sleep 10 ; done && sudo shutdown -h now ' $curpid &> run.txt
-exit
+nohup sh -c 'while ps -p $0 &> /dev/null; do sleep 10 ; done && sudo shutdown -h now ' $curpid &> run.txt &
