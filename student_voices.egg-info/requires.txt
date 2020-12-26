@@ -1,0 +1,5 @@
+pandas
+nltk
+gensim
+sklearn
+TextBlob
