@@ -25,7 +25,7 @@ setup(
 			# 'run_trader = day_trader.run_trader:main'
 		]
 	},
-	install_requires=['pandas','nltk','gensim','sklearn','TextBlob'], #selenium and bs4 are excluded because scraper is no longer relevant 
+	install_requires=['pandas','nltk','gensim','sklearn','TextBlob', 'spot-connect'], #selenium and bs4 are excluded because scraper is no longer relevant 
 	package_data={
 		'student_voices':[
 			# 'data/current_session_ids.pickle',
