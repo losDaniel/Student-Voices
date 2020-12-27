@@ -190,11 +190,11 @@ if __name__ == '__main__':
     if not os.path.exists(args.path+'/cleaned_data/'):
         os.mkdir(args.path+'/cleaned_data/')
 
-    if not os.path.exists(args.path+'/full_review_text.pbz2'):
-        raise Exception('full_review_text.pbz2 not found in --path, please use another path or create the file with clean_data.gen_data()')
-
-    if not os.path.exists(args.path+'/by_rating_range.pbz2'):
-        raise Exception('by_rating_range.pbz2 not found in --path, please use another path or create the file with clean_data.create_hardcoded_ratings_bins')
+#    if not os.path.exists(args.path+'/full_review_text.pbz2'):
+#        raise Exception('full_review_text.pbz2 not found in --path, please use another path or create the file with clean_data.gen_data()')
+#
+#    if not os.path.exists(args.path+'/by_rating_range.pbz2'):
+#        raise Exception('by_rating_range.pbz2 not found in --path, please use another path or create the file with clean_data.create_hardcoded_ratings_bins')
 
     data_configurations = data_configuration_hardcodes()
 
