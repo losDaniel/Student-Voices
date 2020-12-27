@@ -2,23 +2,26 @@ import sys
 sys.path.append('../')
 
 import os, re, multiprocessing, string, time
+import numpy as np
+import pandas as pd
 
 from path import Path 
 root = Path(os.path.dirname(os.path.abspath(__file__)))
 
-import numpy as np
 from student_voices import sv_utils as bn 
  
+from nltk.stem.wordnet import WordNetLemmatizer
 from nltk.stem.porter import PorterStemmer
 from nltk.corpus import stopwords
 from nltk.tokenize import RegexpTokenizer
 
+from gensim.models.phrases import Phrases, Phraser
 from gensim.utils import save_as_line_sentence
 from gensim.corpora import Dictionary
 from textblob import TextBlob
 
 from sklearn.svm import LinearSVC 
-
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
@@ -279,7 +282,6 @@ def populate_stems(word, # the word you want to stem or lemmatize
         stem_map[tok][word] = 1 
         
     return tok
-
 
 # Identify and return phrases 
 def find_phrases(docs, phrase_thresh = 40, gram = 2):
