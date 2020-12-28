@@ -2,6 +2,9 @@ import matplotlib, random
 import pandas as pd
 import plotly.graph_objects as go
 from IPython.display import display_html
+from matplotlib import pyplot as plt
+import numpy as np
+import os
 
 
 def display_side_by_side(*args):
@@ -116,3 +119,34 @@ def plot_rating_dist(site_data, reverse_axis=False):
         fig.update_layout(xaxis = dict(autorange = "reversed"))
 
     return fig
+
+
+def chart_review_lengths(tables, save=None):
+    name = [] 
+    counts = [] 
+    p25 = []
+    p50 = [] 
+    p75 = [] 
+    for t in tables: 
+        name.append(t.columns[0])
+        counts.append(int(t.loc['count'].values[0].replace(',','')))
+        p25.append(int(t.loc['25%'].values[0].replace(',','')))
+        p50.append(int(t.loc['50%'].values[0].replace(',','')))
+        p75.append(int(t.loc['75%'].values[0].replace(',','')))
+    graph_data = pd.DataFrame({'name':name,'count':counts,'p25':p25,'p50':p50,'p75':p75}).sort_values('count')
+
+    plt.rcParams['figure.figsize'] = 7, 7
+    plt.rcParams['axes.facecolor']='lightblue'
+    plt.rcParams['figure.facecolor']='white'
+    plt.plot(graph_data['count'],graph_data['p25'], linestyle='--', marker='x')
+    plt.plot(graph_data['count'],graph_data['p50'], linestyle='--', marker='x')
+    plt.plot(graph_data['count'],graph_data['p75'], linestyle='--', marker='x')
+    plt.gca().yaxis.grid(True)
+    plt.gca().xaxis.grid(True)
+    plt.yticks(np.arange(0, max(graph_data['p75'])+10, 10))
+    plt.ylabel('Review Length')
+    plt.xlabel('Number of Observations')
+    plt.legend()
+    if save is not None: 
+        plt.savefig(save)
+    plt.show()   

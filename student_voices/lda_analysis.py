@@ -1,11 +1,14 @@
-import bear_necessities as bn
-import os
-import time
-import pandas as pd
-import modeling_tools as mt
-import multiprocessing
+import os, sys
+sys.path.append('../')
+
+from student_voices import sv_utils as bn 
+from student_voices import modeling_tools as mt 
+
 from collections import OrderedDict
 from gensim import models
+
+import time, multiprocessing
+import pandas as pd
 
 cpu_count = multiprocessing.cpu_count() - 1
 print("Available Cores: %d" % cpu_count)
@@ -13,6 +16,77 @@ print("Available Cores: %d" % cpu_count)
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 #-#-# MODELING  FUNCTIONS #-#-#
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
+
+def hardcoded_lda_parameters(ranges, range_indices): 
+
+    lda_parameters={}
+    
+    number_of_topics_to_try = list(range(3,30,1))    
+    
+    lda_parameters['LDA1']={} 
+    for rng in ranges: 
+        corp_len = len(range_indices[rng])
+    
+        lda_parameters['LDA1'][rng]={}
+        lda_parameters['LDA1'][rng]['ntrange'] = number_of_topics_to_try
+        lda_parameters['LDA1'][rng]['review_length'] = 100
+        lda_parameters['LDA1'][rng]['passes'] = 64
+        lda_parameters['LDA1'][rng]['nbelow'] = 30
+        lda_parameters['LDA1'][rng]['nabove'] = .4
+        lda_parameters['LDA1'][rng]['corpus_length']=corp_len   
+    
+    # Increase the review length requirement for the highest category because of sheer volume. Its not necessary to keep a corpus that's so large.     
+    lda_parameters['LDA1']['[95, 101)']['review_length'] = 175 
+
+    
+    lda_parameters['LDA2']={} 
+    for rng in ranges: 
+        corp_len = len(range_indices[rng])
+    
+        lda_parameters['LDA2'][rng]={}
+        lda_parameters['LDA2'][rng]['ntrange'] = number_of_topics_to_try
+        lda_parameters['LDA2'][rng]['review_length'] = 125
+        lda_parameters['LDA2'][rng]['passes'] = 64
+        lda_parameters['LDA2'][rng]['nbelow'] = 20
+        lda_parameters['LDA2'][rng]['nabove'] = .4
+        lda_parameters['LDA2'][rng]['corpus_length']=corp_len   
+    
+    # Increase the review length requirement for the highest category because of sheer volume. Its not necessary to keep a corpus that's so large.     
+    lda_parameters['LDA2']['[95, 101)']['review_length'] = 200 
+
+
+    lda_parameters['LDA3']={} 
+    for rng in ranges: 
+        corp_len = len(range_indices[rng])
+    
+        lda_parameters['LDA3'][rng]={}
+        lda_parameters['LDA3'][rng]['ntrange'] = number_of_topics_to_try
+        lda_parameters['LDA3'][rng]['review_length'] = 150
+        lda_parameters['LDA3'][rng]['passes'] = 64
+        lda_parameters['LDA3'][rng]['nbelow'] = 20
+        lda_parameters['LDA3'][rng]['nabove'] = .4
+        lda_parameters['LDA3'][rng]['corpus_length']=corp_len   
+    
+    # Increase the review length requirement for the highest category because of sheer volume. Its not necessary to keep a corpus that's so large.     
+    lda_parameters['LDA3']['[95, 101)']['review_length'] = 225 
+
+    
+    lda_parameters['LDA4']={} 
+    for rng in ranges: 
+        corp_len = len(range_indices[rng])
+    
+        lda_parameters['LDA4'][rng]={}
+        lda_parameters['LDA4'][rng]['ntrange'] = number_of_topics_to_try
+        lda_parameters['LDA4'][rng]['review_length'] = 175
+        lda_parameters['LDA4'][rng]['passes'] = 64
+        lda_parameters['LDA4'][rng]['nbelow'] = 20
+        lda_parameters['LDA4'][rng]['nabove'] = .4
+        lda_parameters['LDA4'][rng]['corpus_length']=corp_len   
+        
+    # Increase the review length requirement for the highest category because of sheer volume. Its not necessary to keep a corpus that's so large.     
+    lda_parameters['LDA4']['[95, 101)']['review_length'] = 250 
+    
+    return lda_parameters
 
 
 

@@ -100,6 +100,42 @@ def get_clean_data_script(config, log_file_name, region, path, cancel_fleet=True
     return script     
 
 
+def get_lda_script(config, setting, model_dir, config_path, log_file_name, region, cancel_fleet=True, script='', run_as_user='', delimiter='\n'):
+    # To be run within an instance 
+    
+    if script=='':    
+        # Bash scripts submitted as user data must have the correct header 
+        script = bash_scripts.init_userdata_script()
+    
+    script+= 'cd efs'+delimiter 
+    
+    # Use the package commands to run the job 
+    if run_as_user=='': 
+        # Run the modeling tools script for a preliminary setup 
+        script+= 'python /home/ec2-user/efs/Student-Voices/student_voices/modeling_tools.py'+delimiter
+    else: 
+        script += 'sudo runuser -l '+run_as_user+" -c 'python /home/ec2-user/efs/Student-Voices/student_voices/modeling_tools.py'"+delimiter
+
+    command = 'python /home/ec2-user/efs/Student-Voices/student_voices/run_lda.py -c '+str(config)+' -cp '+str(config_path)+' -md '+str(model_dir)+' -s '+str(setting) 
+        
+    if cancel_fleet: 
+        # Use the package commands to run the job 
+        if run_as_user=='': 
+            script = bash_scripts.cancel_fleet_after_command(command, region, command_log=log_file_name, script=script)
+        else: 
+            script = bash_scripts.cancel_fleet_after_command(command, region, command_log=log_file_name, run_as_user=run_as_user, script=script)
+    else: 
+        if run_as_user=='': 
+            script += command+'> '+log_file_name+delimiter
+        else: 
+            command += '> '+log_file_name
+            script +=bash_scripts.run_command_as_user(command, user=run_as_user, delimiter=delimiter)    
+
+    return script     
+
+
+
+
 
 
 
