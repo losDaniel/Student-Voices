@@ -109,7 +109,7 @@ def get_lda_script(config, setting, model_dir, config_path, log_file_name, regio
     
     script+= 'cd /home/ec2-user/efs'+delimiter 
     
-    script+= 'mkdir '+model_dir+'/'+setting+'_'+config
+    script+= 'mkdir '+model_dir+'/'+setting+'_'+config+delimiter
     
     # Use the package commands to run the job 
     if run_as_user=='': 

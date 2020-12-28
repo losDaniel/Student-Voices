@@ -103,9 +103,15 @@ def train_ldas(docs, passes, ntrange, id2word, cores = cpu_count):
 
     # create an ordered dictionary to store the results from each model
     trained_models = OrderedDict()
+    
+    print('Iterating over topic numbers')
+    st = time.time()
 
     # we will train models for different numbers of topics and evaluate the coherence for each 
     for num_topics in ntrange: 
+        
+        st2 = time.time()
+        
         print("Training LDA(k=%d)" % num_topics)
         # train the model on multiple cores
         lda = models.LdaMulticore(
@@ -117,6 +123,8 @@ def train_ldas(docs, passes, ntrange, id2word, cores = cpu_count):
         
         # add it to the dictionary of trained models 
         trained_models[num_topics] = lda
+        
+        print('Finished in '+str(time.time()-st2)+' at '+str(time.time()-st))
     
     return trained_models
 
