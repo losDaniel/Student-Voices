@@ -21,7 +21,7 @@ def hardcoded_lda_parameters(ranges, range_indices):
 
     lda_parameters={}
     
-    number_of_topics_to_try = list(range(3,30,1))    
+    number_of_topics_to_try = list(range(3,30,2))    
     
     lda_parameters['LDA1']={} 
     for rng in ranges: 
