@@ -21,8 +21,8 @@ def run_lda_analysis(config, setting, model_dir, config_path):
     # define the directory where you want to save the models
     model_directory = model_dir+'/'+setting+'_'+config
     
-#    if not os.path.exists(model_directory):
-#        os.mkdir(model_directory)
+    if not os.path.exists(model_directory):
+        os.mkdir(model_directory)
 
     # import the range indices 
     range_indices = bn.loosen(root + '/data/by_rating_range.pickle')
@@ -65,9 +65,6 @@ def run_lda_analysis(config, setting, model_dir, config_path):
 
 
 if __name__ == '__main__':
-
-    # Home directory for the AWS instance
-    os.chdir("/home/ec2-user/efs")
 
     parser = argparse.ArgumentParser(description='Launch spot instance')
     parser.add_argument('-c', '--configuration', help='Configuration (A1,B1,C1,...)', required=True)
