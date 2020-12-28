@@ -107,9 +107,9 @@ def get_lda_script(config, setting, model_dir, config_path, log_file_name, regio
         # Bash scripts submitted as user data must have the correct header 
         script = bash_scripts.init_userdata_script()
     
-    script+= 'cd /home/ec2-user/efs'+delimiter 
+    script+= 'cd /home/ec2-user/efs/models'+delimiter 
     
-    script+= 'mkdir '+model_dir+'/'+setting+'_'+config+delimiter
+    #script+= 'mkdir '+model_dir+'/'+setting+'_'+config+delimiter
     
     # Use the package commands to run the job 
     if run_as_user=='': 
