@@ -36,19 +36,19 @@ def get_instance_setup_script(filesystem, region, availability_zone=None, run_as
         # Even though we don't need the sudo command in user_data, we use it in case this method were used out of the root command line
         script += 'sudo runuser -l '+run_as_user+" -c 'pip install -e /home/"+run_as_user+"/efs/Student-Voices/'"+delimiter
         
-    # Create the directories and subdirectories we needs 
-    script+= bash_scripts.run_command_as_user('mkdir results', run_as_user, '\n')
-    
-    script+= 'cd results'+delimiter
-    script+= bash_scripts.run_command_as_user('mkdir LDAdescriptions', run_as_user, '\n')
-    script+= bash_scripts.run_command_as_user('mkdir LDAdistributions', run_as_user, '\n')
-    
-    script+= 'cd ..'+delimiter
-    script+= bash_scripts.run_command_as_user('mkdir models', run_as_user, '\n')
-    
-    script+= bash_scripts.run_command_as_user('mkdir graphs', run_as_user, '\n')
-    script+= 'cd graphs'+delimiter
-    script+= bash_scripts.run_command_as_user('mkdir LDAGraphs', run_as_user, '\n')
+#    # Create the directories and subdirectories we needs 
+#    script+= 'mkdir results'+delimiter
+#    
+#    script+= 'cd results'+delimiter
+#    script+= 'mkdir LDAdescriptions'+delimiter
+#    script+= 'mkdir LDAdistributions'+delimiter
+#    
+#    script+= 'cd ..'+delimiter
+#    script+= 'mkdir models'+delimiter
+#    
+#    script+= 'mkdir graphs'+delimiter
+#    script+= 'cd graphs'+delimiter
+#    script+= 'mkdir LDAGraphs'+delimiter
 
     if run_as_user =='': 
         script+= 'python -m nltk.downloader all'+delimiter
@@ -107,9 +107,9 @@ def get_lda_script(config, setting, model_dir, config_path, log_file_name, regio
         # Bash scripts submitted as user data must have the correct header 
         script = bash_scripts.init_userdata_script()
     
-    script+= 'cd '+model_dir+delimiter 
+    script+= 'cd /home/ec2-user/efs/models'+delimiter 
     
-    script+= bash_scripts.run_command_as_user('mkdir '+setting+'_'+config, run_as_user, '\n')
+    #script+= 'mkdir '+model_dir+'/'+setting+'_'+config+delimiter
     
     # Use the package commands to run the job 
     if run_as_user=='': 

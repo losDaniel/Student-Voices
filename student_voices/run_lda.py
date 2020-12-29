@@ -21,9 +21,9 @@ def run_lda_analysis(config, setting, model_dir, config_path):
     # define the directory where you want to save the models
     model_directory = model_dir+'/'+setting+'_'+config+'/'
     
-#    if not os.path.exists(model_directory): 
-#        print('Creating directory ', str(model_directory))
-#        os.mkdir(model_directory)
+    if not os.path.exists(model_directory): 
+        print('Creating directory ', str(model_directory))
+        os.mkdir(model_directory)
 
     # import the range indices 
     range_indices = bn.loosen(root + '/data/by_rating_range.pickle')
