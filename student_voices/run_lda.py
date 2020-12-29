@@ -19,9 +19,10 @@ def run_lda_analysis(config, setting, model_dir, config_path):
     text, stem_map, lemma_map, phrase_frequencies = bn.decompress_pickle(config_path+'/cleaned_docs_'+config+'.pbz2')
                     
     # define the directory where you want to save the models
-    model_directory = model_dir+'/'+setting+'_'+config
+    model_directory = model_dir+'/'+setting+'_'+config+'/'
     
-    if not os.path.exists(model_directory):
+    if not os.path.exists(model_directory): 
+        print('Creating directory ', str(model_directory))
         os.mkdir(model_directory)
 
     # import the range indices 
