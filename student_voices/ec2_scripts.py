@@ -100,7 +100,7 @@ def get_clean_data_script(config, log_file_name, region, path, cancel_fleet=True
     return script     
 
 
-def get_lda_script(config, setting, model_dir, config_path, log_file_name, region, cancel_fleet=True, script='', run_as_user='', delimiter='\n'):
+def get_lda_script(config, setting, ntop, model_dir, config_path, log_file_name, region, cancel_fleet=True, script='', run_as_user='', delimiter='\n'):
     # To be run within an instance 
     
     if script=='':    
@@ -118,7 +118,7 @@ def get_lda_script(config, setting, model_dir, config_path, log_file_name, regio
     else: 
         script += 'sudo runuser -l '+run_as_user+" -c 'python /home/ec2-user/efs/Student-Voices/student_voices/modeling_tools.py'"+delimiter
 
-    command = 'python /home/ec2-user/efs/Student-Voices/student_voices/run_lda.py -c '+str(config)+' -cp '+str(config_path)+' -md '+str(model_dir)+' -s '+str(setting) 
+    command = 'python /home/ec2-user/efs/Student-Voices/student_voices/run_lda.py -c '+str(config)+' -cp '+str(config_path)+' -md '+str(model_dir)+' -s '+str(setting)+' -nt '+str(ntop)
         
     if cancel_fleet: 
         # Use the package commands to run the job 

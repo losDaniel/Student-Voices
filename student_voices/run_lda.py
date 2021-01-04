@@ -12,7 +12,7 @@ from path import Path
 root = Path(os.path.dirname(os.path.abspath(__file__)))
 
 
-def run_lda_analysis(config, setting, model_dir, config_path): 
+def run_lda_analysis(config, setting, model_dir, config_path, numtopics): 
 
     st = time.time()
     
@@ -30,7 +30,7 @@ def run_lda_analysis(config, setting, model_dir, config_path):
     # create a list of each range 
     ranges = list(np.sort(list(range_indices.keys())))
     # import hardcoded lda paramter dictionary 
-    lda_parameters =ld.hardcoded_lda_parameters(ranges, range_indices)
+    lda_parameters =ld.hardcoded_lda_parameters(ranges, range_indices, numtopics)
     # import the data if need be
     data = bn.decompress_pickle(root+'/data/review_stats.pbz2')
 
@@ -72,6 +72,7 @@ if __name__ == '__main__':
     parser.add_argument('-cp', '--configpath', help='Path to configuration data', required=True)
     parser.add_argument('-md', '--modeldir', help='Path to save the models', required=True)
     parser.add_argument('-s', '--setting', help='LDA parameter setting to use from hardcoded options', required=True)
+    parser.add_argument('-nt', '--numtopics', help='Option for the number of topics: A,B,C,...')
 
     args = parser.parse_args()
 
@@ -79,7 +80,8 @@ if __name__ == '__main__':
     config_path = args.configpath
     model_dir = args.modeldir
     setting = args.setting
+    numtopics = args.numtopics
     
-    run_lda_analysis(config, setting, model_dir, config_path)
+    run_lda_analysis(config, setting, model_dir, config_path, numtopics)
 
 
