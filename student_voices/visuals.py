@@ -150,3 +150,42 @@ def chart_review_lengths(tables, save=None):
     if save is not None: 
         plt.savefig(save)
     plt.show()   
+    
+    
+
+import seaborn as sns
+    
+def plot_restricted_review_dists(data, save=None):
+    plt.rcParams['axes.facecolor']= 'white'
+    plt.rcParams['figure.facecolor']= 'white'
+    plt.rcParams['font.size'] = 18
+    # create a column containing the number of reviews a given teacher recieved
+    data['num_reviews'] = data.groupby('Teacher')['FID'].transform('count')
+    
+    # we will also bin these differently for the histograms
+    bins = list(range(0,101,10))
+    
+    min_num_reviews = [1,3,5,10,25,50]
+       
+    fig, axes = plt.subplots(2,3)
+    plt.subplots_adjust(wspace=0.25, hspace=0.25, left=0.1, bottom=0.22, right=0.96, top=0.92)
+    axes = axes.flatten()
+    fig.set_size_inches(20, 15)
+    #fig.suptitle('Distribution of Features')
+    
+    
+    for i,n in enumerate(min_num_reviews):        
+        lbl = 'Min Reviews %d, Total Obs are %d' % (n, (len(data.loc[data['num_reviews']>n])))
+        graph_data = pd.cut(data.loc[data['num_reviews']>n, 'Rating'], bins, labels=[int(i) for i in bins[1:]]).dropna()
+        vc = pd.DataFrame(graph_data.value_counts().reset_index())
+        vc.columns = [lbl, '']
+        sns.lineplot(vc[lbl], vc[''], ax=axes[i])
+        if i == 0 or i == 3: 
+             axes[i].set_ylabel('# Reviews')
+    #    sns.distplot(pd.cut(data.loc[data['num_reviews']>n, 'Rating'], bins, labels=[int(i) for i in bins[1:]]).dropna(), axlabel=lbl, ax=axes[i])
+    #    sns.distplot(data.loc[data['num_reviews']>n,'Rating'], bins = bins, axlabel=lbl, ax=axes[i])
+    #    axes[i].axvline(data.loc[data['num_reviews']>n,'Rating'].mean(),linewidth=1)
+    #    axes[i].axvline(data.loc[data['num_reviews']>n,'Rating'].median(),linewidth=1, color='r')
+    
+    if save is not None: 
+        fig.savefig(save)

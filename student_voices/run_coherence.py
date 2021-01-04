@@ -71,8 +71,10 @@ def run_coherence_analysis(setting, config, data_dir, model_dir, results_dir):
 
         print('Estimating coherence for range '+str(rng)+', setting '+str(setting)+', config '+str(config)+' took '+str(time.time()-st))
 
-    ranked_results.to_csv(results_dir+'/ranked_coherence_'+str(setting)+'_'+str(config)+'.csv')        
-    bn.compressed_pickle(results_dir+'/full_coherence_'+str(setting)+'_'+str(config), coherence_guide)
+    ranked_results.to_csv(results_directory+'/ranked_coherence_'+str(setting)+'_'+str(config)+'.csv')        
+    bn.compressed_pickle(results_directory+'/full_coherence_'+str(setting)+'_'+str(config), coherence_guide)
+
+
 
 
 '''
