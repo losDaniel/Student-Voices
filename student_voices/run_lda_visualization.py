@@ -102,22 +102,6 @@ def run_coherence_analysis(setting, config, data_dir, model_dir, results_dir):
     # get the topic num with the top coherence score 
     best_topic_num = int(coherence_scores[0][0])
 
-    # get the most coherent model 
-    model = trained_models[best_topic_num]
-
-    # specify paths to save the results  
-    lda_viz_path = os.getcwd()+'/graphs/LDA Graphs/Viz_'+rng+'_'+str(best_topic_num)+'_'+setting+'_'+config+'.html'
-    topic_des_path = os.getcwd()+'/results/LDA Descriptions/Des_'+rng+'_'+str(best_topic_num)+'_'+setting+'_'+config+'.csv'
-    topic_vec_path = os.getcwd()+'/results/LDA Distributions/Vec_'+rng+'_'+str(best_topic_num)+'_'+setting+'_'+config # no extension because we will compress
-    
-    # Create and save the topic pyLDAvis HTML topic visualization 
-    vs.save_topic_visualization(model, docs, dictionary, lda_viz_path)
-    
-    # Save the top words for each topic and their coefficients 
-    ld.write_lda_descriptions(topic_des_path, model, num_words)
-
-    # Get main topic in each document
-    sentence_topics_df = ld.get_sentence_topics(model, corpus, fulldocs, path=topic_vec_path)
 
 
 '''
