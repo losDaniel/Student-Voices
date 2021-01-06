@@ -17,9 +17,8 @@ print("Available Cores: %d" % cpu_count)
 #-#-# MODELING  FUNCTIONS #-#-#
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 
-def hardcoded_lda_parameters(ranges, range_indices, numtopics): 
 
-    lda_parameters={}
+def get_num_topic_option():
     
     num_topics_options = {} 
     num_topics_options['A'] = list(range(3,30,3))
@@ -27,7 +26,14 @@ def hardcoded_lda_parameters(ranges, range_indices, numtopics):
     num_topics_options['C'] = [22, 23, 25, 26]
     num_topics_options['D'] = [4, 5, 7, 8, 10, 11]
     num_topics_options['E'] = list(range(5,12))+list(range(12,33,4))
-        
+
+    return num_topics_options    
+
+def hardcoded_lda_parameters(ranges, range_indices, numtopics): 
+
+    lda_parameters={}
+    
+    num_topics_options = get_num_topic_option()
     number_of_topics_to_try = num_topics_options[numtopics]
     
     lda_parameters['LDA1']={} 
