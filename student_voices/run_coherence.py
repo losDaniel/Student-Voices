@@ -25,9 +25,9 @@ def run_coherence_analysis(setting, config, numtopics, data_dir, model_dir, resu
         print('Creating directory ', str(results_directory))
         os.mkdir(results_directory)
 
-    if corpus_group == 1: 
+    if corpus_group == 'A': 
         range_indices = bn.loosen(root + '/data/by_rating_range.pickle')
-    elif corpus_group == 2: 
+    elif corpus_group == 'B': 
         range_indices = bn.loosen(root + '/data/by_rating_range_2.pickle')
 
     # import the data if need be
@@ -119,7 +119,7 @@ if __name__ == '__main__':
     setting = args.setting
     results_dir = args.resultsdir
     numtopics = args.numtopics
-    corpus_group = int(args.corpusgrouping)
+    corpus_group = args.corpusgrouping
     
     run_coherence_analysis(setting, config, numtopics, config_path, model_dir, results_dir, corpus_group)
 

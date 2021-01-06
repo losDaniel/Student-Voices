@@ -4,8 +4,10 @@ import plotly.graph_objects as go
 from IPython.display import display_html
 from matplotlib import pyplot as plt
 import numpy as np
-import os
-
+import matplotlib.patches as mpatches
+import pyLDAvis
+import pyLDAvis.gensim
+import re 
 
 def display_side_by_side(*args):
     '''Display the given tables side by side'''
@@ -189,3 +191,93 @@ def plot_restricted_review_dists(data, save=None):
     
     if save is not None: 
         fig.savefig(save)
+        
+        
+# Function to describe the topics 
+def get_topic_reviews(topic, reviews, poolsize =50, samplesize = 20, fsize = (8,8)):
+    # set graph colors 
+    plt.rcParams['axes.facecolor']= 'gold'
+    plt.rcParams['figure.facecolor']= 'lightgray'
+
+    # get the reviews for the specified topic 
+    topic_reviews = reviews.loc[reviews['Dominant_Topic']==topic].sort_values(by=['Dominant_Topic','Topic_Perc_Contrib'], ascending=[False, False])
+    
+    # get the keywords for the topics
+    keywords = ', '.join(list(topic_reviews[:1]['Keywords'].values))
+
+    # show the key words 
+    print(keywords)
+
+    # instantiate the plot 
+    fig = plt.figure(1, figsize = fsize)
+    ax = fig.add_subplot(111)
+    
+    # plot the distribution of the percentage contribution of the topic to each review that has the given topic as a dominant topic
+    sns.distplot(topic_reviews['Topic_Perc_Contrib'], ax=ax)
+    plt.show()
+    
+    # select a random sample of reviews from a pool of size poolsize  
+    sample = random.sample(list(topic_reviews['Text'][:poolsize].values),samplesize)
+    # display each review
+    print('\n')
+    for s in sample:
+        print(s.replace('Submitted by a student','').strip(),'\n')
+    
+    return topic_reviews
+
+
+def plot_dominant_topics(reviews, ex, tc=None, plt_fontsize=14, leg_fontsize=14, newlinechars=120):
+    # set graph colors 
+    plt.rcParams['axes.facecolor']= 'gold'
+    plt.rcParams['figure.facecolor']= 'lightgray'
+    plt.rcParams['font.size']= plt_fontsize    
+    plt.rcParams["legend.fontsize"] = leg_fontsize
+    
+    # create the elements of the lengend with the titles 
+    patchList = []
+    i = 0 
+    for key in ex: # for each topic 
+        # we make the legend with the detailed descriptions of each topic and insert a new line every `newlinechars`# of characters
+        data_key = mpatches.Patch(color=sns.color_palette('husl',len(ex))[i], label=str(i)+': '+re.sub("(.{"+str(newlinechars)+"})", "\\1\n", list(ex.values())[i], 0, re.DOTALL))
+        patchList.append(data_key)
+        i+=1
+
+    # get the value counts for the dominant topics to graph 
+    vc = reviews['Dominant_Topic'].value_counts().sort_index()
+    fig = plt.figure(1, figsize=(15,15))
+    
+    fig.suptitle('Number of Reviews Per Topic\n(** next to description = topics that may not be consistent)')
+    
+    ax = fig.add_subplot(111)
+    # create the barplot with the dominant topic distributions
+    sns.barplot(list(vc.keys().astype(int)), list(vc.values), ax=ax, palette=sns.color_palette('husl',len(ex)))
+
+    if tc is not None: 
+        ax.set_ylabel('(bars) number of observations')
+        ax2 = ax.twinx()
+        ax2.set_ylabel('(line) coherence score')
+        # graph line plot with coherence scores
+        sns.lineplot(list(vc.keys().astype(int)), tc, ax=ax2)
+    
+    # place the legen below the graph 
+    plt.legend(handles=patchList, loc='upper center', bbox_to_anchor=(0.5, -0.05), fancybox=True, shadow=True)
+    plt.show()
+    
+    
+def save_topic_visualization(model, docs, dic, path):
+    '''
+    Use the pyLDAvis module to generate a graph of the distributed topics. 
+    - model : lda model to use (lda or ldamulticore)
+    - docs : we want to visualize 
+    - dic : the dictionary from the model 
+    - path : str. the path and filename for the graph, include ".html" extension in the name. Does not save when set to None 
+    - show : boolean. Set to true to display the HTML version of the graph 
+    '''
+    text = [dic.doc2bow(doc) for doc in docs]
+    lda_vis = pyLDAvis.gensim.prepare(model, text, dic, sort_topics = True)
+    # save it to an html format    
+    try: 
+        pyLDAvis.save_html(lda_vis, path)
+    except Exception as e: 
+        print(str(e))
+        print('Make sure you are entering a valid path with the .html extension')

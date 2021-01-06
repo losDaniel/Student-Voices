@@ -26,9 +26,9 @@ def run_lda_analysis(config, setting, model_dir, config_path, numtopics, corpus_
         os.mkdir(model_directory)
 
     # import the range indices 
-    if corpus_group == 1: 
+    if corpus_group == 'A': 
         range_indices = bn.loosen(root + '/data/by_rating_range.pickle')
-    elif corpus_group == 2: 
+    elif corpus_group == 'B': 
         range_indices = bn.loosen(root + '/data/by_rating_range_2.pickle')
         
     # create a list of each range 
@@ -86,7 +86,7 @@ if __name__ == '__main__':
     model_dir = args.modeldir
     setting = args.setting
     numtopics = args.numtopics
-    corpus_group = int(args.corpusgrouping)
+    corpus_group = args.corpusgrouping
     
     run_lda_analysis(config, setting, model_dir, config_path, numtopics, corpus_group)
 

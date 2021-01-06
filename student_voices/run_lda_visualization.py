@@ -13,10 +13,122 @@ from path import Path
 root = Path(os.path.dirname(os.path.abspath(__file__)))
 
 
+save_topic_visualization(model, docs, dic, path)
+
+
+def setup_context():
+    
+    full_text = bn.decompress_pickle(os.getcwd()+'/data/full_review_text.pbz2')
+
+    model_directory = model_dir+'/'+setting+'_'+config+'/'
+
+    results_directory = results_dir+'/'+setting+'_'+config+'/'
+    
+    text, stem_map, lemma_map, phrase_frequencies = bn.decompress_pickle(data_dir+'/cleaned_docs_'+config+'.pbz2')
+
+    if corpus_group == 1: 
+        range_indices = bn.loosen(root + '/data/by_rating_range.pickle')
+    elif corpus_group == 2: 
+        range_indices = bn.loosen(root + '/data/by_rating_range_2.pickle')
+
+    # create a list of each range 
+    ranges = list(np.sort(list(range_indices.keys())))
+
+    # import the data if need be
+    data = bn.decompress_pickle(root+'/data/review_stats.pbz2')
+
+    # import hardcoded lda paramter dictionary 
+    lda_parameters =ld.hardcoded_lda_parameters(ranges, range_indices, numtopics)
+
+
+
+def run_lda_visualization(setting, config, numtopics, data_dir, raw_dir, model_dir, results_dir, corpus_group):
+
+
+    for rng in ranges: 
+    
+        # pull the column of review length
+        indices = data.loc[range_indices[rng],'Review_Length']
+        # keep the indices of the rows with review length > than the minimum length
+        filtered_index = indices[indices>lda_parameters[setting][rng]['review_length']].index
+        
+        # filter the training corpus by review length and save the length 
+        docs = [text[idx] for idx in filtered_index]
+        # get original reviews for the same documents 
+        fulldocs = [full_text[idx] for idx in filtered_index]
+        
+        # load the models 
+        trained_models = ld.load_models(model_directory,setting+'_'+config+'_'+rng,list(range(10,101,15)))
+    
+        # get the dictionary 
+        corpus, dictionary, literal_dictionary, id2word, word2id = mt.set_dictionary(docs,
+                                                                                 lda_parameters[setting][rng]['nbelow'],
+                                                                                 lda_parameters[setting][rng]['nabove'])
+    
+        # extract the coherence score data
+        coherence_scores=list(zip(re.findall('[0-9]+\.*[0-9]*', row['coherence_scores'])[::2],
+                                  re.findall('[0-9]+\.*[0-9]*', row['coherence_scores'])[1::2]))
+    
+        # get the topic num with the top coherence score 
+        best_topic_num = int(coherence_scores[0][0])
+    
+        # get the most coherent model 
+        model = trained_models[best_topic_num]
+    
+        # specify paths to save the results  
+        lda_viz_path = os.getcwd()+'/graphs/LDA Graphs/Viz_'+rng+'_'+str(best_topic_num)+'_'+setting+'_'+config+'.html'
+        topic_des_path = os.getcwd()+'/results/LDA Descriptions/Des_'+rng+'_'+str(best_topic_num)+'_'+setting+'_'+config+'.csv'
+        topic_vec_path = os.getcwd()+'/results/LDA Distributions/Vec_'+rng+'_'+str(best_topic_num)+'_'+setting+'_'+config # no extension because we will compress
+        
+        # Create and save the topic pyLDAvis HTML topic visualization 
+        vs.save_topic_visualization(model, docs, dictionary, lda_viz_path)
+        
+        # Save the top words for each topic and their coefficients 
+        ld.write_lda_descriptions(topic_des_path, model, num_words)
+    
+        # Get main topic in each document
+        sentence_topics_df = ld.get_sentence_topics(model, corpus, fulldocs, path=topic_vec_path)
+    
+    
+    
+
+
+
+    # get the dictionary 
+    corpus, dictionary, literal_dictionary, id2word, word2id = mt.set_dictionary(docs,
+                                                                             lda_parameters[setting][rng]['nbelow'],
+                                                                             lda_parameters[setting][rng]['nabove'])
+
+    # extract the coherence score data
+    coherence_scores=list(zip(re.findall('[0-9]+\.*[0-9]*', row['coherence_scores'])[::2],
+                              re.findall('[0-9]+\.*[0-9]*', row['coherence_scores'])[1::2]))
+
+    # get the topic num with the top coherence score 
+    best_topic_num = int(coherence_scores[0][0])
+
+    # get the most coherent model 
+    model = trained_models[best_topic_num]
+
+    # specify paths to save the results  
+    lda_viz_path = os.getcwd()+'/graphs/LDA Graphs/Viz_'+rng+'_'+str(best_topic_num)+'_'+setting+'_'+config+'.html'
+    topic_des_path = os.getcwd()+'/results/LDA Descriptions/Des_'+rng+'_'+str(best_topic_num)+'_'+setting+'_'+config+'.csv'
+    topic_vec_path = os.getcwd()+'/results/LDA Distributions/Vec_'+rng+'_'+str(best_topic_num)+'_'+setting+'_'+config # no extension because we will compress
+    
+    # Create and save the topic pyLDAvis HTML topic visualization 
+    vs.save_topic_visualization(model, docs, dictionary, lda_viz_path)
+    
+    # Save the top words for each topic and their coefficients 
+    ld.write_lda_descriptions(topic_des_path, model, num_words)
+
+    # Get main topic in each document
+    sentence_topics_df = ld.get_sentence_topics(model, corpus, fulldocs, path=topic_vec_path)
+
 
 
     # specify the number of words  you want to display when describing each topic 
     num_words = 15
+
+
 
 
 def run_coherence_analysis(setting, config, data_dir, model_dir, results_dir, corpus_group):
@@ -135,6 +247,7 @@ if __name__ == '__main__':
     parser.add_argument('-cp', '--configpath', help='Path to configuration data', required=True)
     parser.add_argument('-md', '--modeldir', help='Path to save the models', required=True)
     parser.add_argument('-rd', '--resultsdir', help='Path to save the results', required=True)
+    parser.add_argument('-nt', '--numtopics', help='Option for the number of topics: A,B,C,...', required=True)
     parser.add_argument('-cg', '--corpusgrouping', help='Option for the corpus grouping to pick: 1, 2, 3,...', required=True)
 
     args = parser.parse_args()
@@ -144,8 +257,9 @@ if __name__ == '__main__':
     model_dir = args.modeldir
     setting = args.setting
     results_dir = args.resultsdir
+    numtopics = args.numtopics
     corpus_group = int(args.corpusgrouping)
     
-    run_coherence_analysis(setting, config, config_path, model_dir, results_dir, corpus_group)
+    run_coherence_analysis(setting, config, numtopics, config_path, model_dir, results_dir, corpus_group)
 
 
