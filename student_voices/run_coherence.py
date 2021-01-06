@@ -13,7 +13,7 @@ from path import Path
 root = Path(os.path.dirname(os.path.abspath(__file__)))
 
 
-def run_coherence_analysis(setting, config, data_dir, model_dir, results_dir):
+def run_coherence_analysis(setting, config, numtopics, data_dir, model_dir, results_dir, corpus_group):
 
     text, stem_map, lemma_map, phrase_frequencies = bn.decompress_pickle(data_dir+'/cleaned_docs_'+config+'.pbz2')
 
@@ -25,14 +25,17 @@ def run_coherence_analysis(setting, config, data_dir, model_dir, results_dir):
         print('Creating directory ', str(results_directory))
         os.mkdir(results_directory)
 
+    if corpus_group == 1: 
+        range_indices = bn.loosen(root + '/data/by_rating_range.pickle')
+    elif corpus_group == 2: 
+        range_indices = bn.loosen(root + '/data/by_rating_range_2.pickle')
+
     # import the data if need be
     data = bn.decompress_pickle(root+'/data/review_stats.pbz2')
-    # import the range indices 
-    range_indices = bn.loosen(root + '/data/by_rating_range.pickle')
     # create a list of each range 
     ranges = list(np.sort(list(range_indices.keys())))
     # import hardcoded lda paramter dictionary 
-    lda_parameters =ld.hardcoded_lda_parameters(ranges, range_indices)
+    lda_parameters =ld.hardcoded_lda_parameters(ranges, range_indices, numtopics)
 
     coherence_guide = {}
     ranked_results = pd.DataFrame()
@@ -105,6 +108,8 @@ if __name__ == '__main__':
     parser.add_argument('-cp', '--configpath', help='Path to configuration data', required=True)
     parser.add_argument('-md', '--modeldir', help='Path to save the models', required=True)
     parser.add_argument('-rd', '--resultsdir', help='Path to save the results', required=True)
+    parser.add_argument('-nt', '--numtopics', help='Option for the number of topics: A,B,C,...', required=True)
+    parser.add_argument('-cg', '--corpusgrouping', help='Option for the corpus grouping to pick: 1, 2, 3,...', required=True)
 
     args = parser.parse_args()
 
@@ -113,7 +118,9 @@ if __name__ == '__main__':
     model_dir = args.modeldir
     setting = args.setting
     results_dir = args.resultsdir
+    numtopics = args.numtopics
+    corpus_group = int(args.corpusgrouping)
     
-    run_coherence_analysis(setting, config, config_path, model_dir, results_dir)
+    run_coherence_analysis(setting, config, numtopics, config_path, model_dir, results_dir, corpus_group)
 
 

@@ -26,6 +26,7 @@ def hardcoded_lda_parameters(ranges, range_indices, numtopics):
     num_topics_options['B'] = [16, 17, 19, 20]
     num_topics_options['C'] = [22, 23, 25, 26]
     num_topics_options['D'] = [4, 5, 7, 8, 10, 11]
+    num_topics_options['E'] = list(range(5,12))+list(range(12,33,4))
         
     number_of_topics_to_try = num_topics_options[numtopics]
     
@@ -41,8 +42,9 @@ def hardcoded_lda_parameters(ranges, range_indices, numtopics):
         lda_parameters['LDA1'][rng]['nabove'] = .4
         lda_parameters['LDA1'][rng]['corpus_length']=corp_len   
     
-    # Increase the review length requirement for the highest category because of sheer volume. Its not necessary to keep a corpus that's so large.     
-    lda_parameters['LDA1']['[95, 101)']['review_length'] = 175 
+    if '[95, 101)' in lda_parameters['LDA1'].keys():
+        # Increase the review length requirement for the highest category because of sheer volume. Its not necessary to keep a corpus that's so large.     
+        lda_parameters['LDA1']['[95, 101)']['review_length'] = 175 
 
     
     lda_parameters['LDA2']={} 
@@ -57,8 +59,9 @@ def hardcoded_lda_parameters(ranges, range_indices, numtopics):
         lda_parameters['LDA2'][rng]['nabove'] = .4
         lda_parameters['LDA2'][rng]['corpus_length']=corp_len   
     
-    # Increase the review length requirement for the highest category because of sheer volume. Its not necessary to keep a corpus that's so large.     
-    lda_parameters['LDA2']['[95, 101)']['review_length'] = 200 
+    if '[95, 101)' in lda_parameters['LDA2'].keys():
+        # Increase the review length requirement for the highest category because of sheer volume. Its not necessary to keep a corpus that's so large.     
+        lda_parameters['LDA2']['[95, 101)']['review_length'] = 200 
 
 
     lda_parameters['LDA3']={} 
@@ -73,8 +76,9 @@ def hardcoded_lda_parameters(ranges, range_indices, numtopics):
         lda_parameters['LDA3'][rng]['nabove'] = .4
         lda_parameters['LDA3'][rng]['corpus_length']=corp_len   
     
-    # Increase the review length requirement for the highest category because of sheer volume. Its not necessary to keep a corpus that's so large.     
-    lda_parameters['LDA3']['[95, 101)']['review_length'] = 225 
+    if '[95, 101)' in lda_parameters['LDA3'].keys():
+        # Increase the review length requirement for the highest category because of sheer volume. Its not necessary to keep a corpus that's so large.     
+        lda_parameters['LDA3']['[95, 101)']['review_length'] = 225 
 
     
     lda_parameters['LDA4']={} 
@@ -89,8 +93,10 @@ def hardcoded_lda_parameters(ranges, range_indices, numtopics):
         lda_parameters['LDA4'][rng]['nabove'] = .4
         lda_parameters['LDA4'][rng]['corpus_length']=corp_len   
         
-    # Increase the review length requirement for the highest category because of sheer volume. Its not necessary to keep a corpus that's so large.     
-    lda_parameters['LDA4']['[95, 101)']['review_length'] = 250 
+    if '[95, 101)' in lda_parameters['LDA4'].keys():
+        # Increase the review length requirement for the highest category because of sheer volume. Its not necessary to keep a corpus that's so large.     
+        lda_parameters['LDA4']['[95, 101)']['review_length'] = 250 
+
     
     return lda_parameters
 

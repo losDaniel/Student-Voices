@@ -12,7 +12,7 @@ from path import Path
 root = Path(os.path.dirname(os.path.abspath(__file__)))
 
 
-def run_lda_analysis(config, setting, model_dir, config_path, numtopics): 
+def run_lda_analysis(config, setting, model_dir, config_path, numtopics, corpus_group): 
 
     st = time.time()
     
@@ -26,7 +26,11 @@ def run_lda_analysis(config, setting, model_dir, config_path, numtopics):
         os.mkdir(model_directory)
 
     # import the range indices 
-    range_indices = bn.loosen(root + '/data/by_rating_range.pickle')
+    if corpus_group == 1: 
+        range_indices = bn.loosen(root + '/data/by_rating_range.pickle')
+    elif corpus_group == 2: 
+        range_indices = bn.loosen(root + '/data/by_rating_range_2.pickle')
+        
     # create a list of each range 
     ranges = list(np.sort(list(range_indices.keys())))
     # import hardcoded lda paramter dictionary 
@@ -72,7 +76,8 @@ if __name__ == '__main__':
     parser.add_argument('-cp', '--configpath', help='Path to configuration data', required=True)
     parser.add_argument('-md', '--modeldir', help='Path to save the models', required=True)
     parser.add_argument('-s', '--setting', help='LDA parameter setting to use from hardcoded options', required=True)
-    parser.add_argument('-nt', '--numtopics', help='Option for the number of topics: A,B,C,...')
+    parser.add_argument('-nt', '--numtopics', help='Option for the number of topics: A,B,C,...', required=True)
+    parser.add_argument('-cg', '--corpusgrouping', help='Option for the corpus grouping to pick: 1, 2, 3,...', required=True)
 
     args = parser.parse_args()
 
@@ -81,7 +86,8 @@ if __name__ == '__main__':
     model_dir = args.modeldir
     setting = args.setting
     numtopics = args.numtopics
+    corpus_group = int(args.corpusgrouping)
     
-    run_lda_analysis(config, setting, model_dir, config_path, numtopics)
+    run_lda_analysis(config, setting, model_dir, config_path, numtopics, corpus_group)
 
 
