@@ -3,3 +3,5 @@ nltk
 gensim
 sklearn
 TextBlob
+spot-connect
+pyLDAvis

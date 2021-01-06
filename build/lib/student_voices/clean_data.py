@@ -101,7 +101,7 @@ def data_configuration_hardcodes():
     data_configurations['B1']['gram']=4
     data_configurations['B1']['pthresh']=50
     data_configurations['B1']['spell_check']=False
-    
+        
     # third configuration - general cleaning without stemming and with TextBlob spell check 
     data_configurations['C1']={}
     data_configurations['C1']['lemmatizer']=True
@@ -116,8 +116,8 @@ def data_configuration_hardcodes():
     
     # fourth configuration - Fasttext cleaning
     data_configurations['D1']={}
-    data_configurations['D1']['lemmatizer']=False
-    data_configurations['D1']['stemmer']=False
+    data_configurations['D1']['lemmatizer']=True
+    data_configurations['D1']['stemmer']=True
     data_configurations['D1']['remove_stops']=True
     data_configurations['D1']['no_not']=None
     data_configurations['D1']['remove_contractions']=True
@@ -126,7 +126,20 @@ def data_configuration_hardcodes():
     data_configurations['D1']['pthresh']=50 # irrelevant here because phrase finder is turned off 
     data_configurations['D1']['spell_check']=False
 
-    # fifth configuration - FastText cleaning with Spell Check 
+    # fifth configuration - stemming over lemming
+    data_configurations['E1']={}
+    data_configurations['E1']['lemmatizer']=False
+    data_configurations['E1']['stemmer']=True
+    data_configurations['E1']['remove_stops']=True
+    data_configurations['E1']['no_not']=None
+    data_configurations['E1']['remove_contractions']=True
+    data_configurations['E1']['repeated_removal']=2
+    data_configurations['E1']['gram']=4
+    data_configurations['E1']['pthresh']=50
+    data_configurations['E1']['spell_check']=False
+
+
+    # sixth configuration - FastText cleaning with Spell Check 
     data_configurations['F1']={}
     data_configurations['F1']['lemmatizer']=False
     data_configurations['F1']['stemmer']=False
@@ -190,11 +203,11 @@ if __name__ == '__main__':
     if not os.path.exists(args.path+'/cleaned_data/'):
         os.mkdir(args.path+'/cleaned_data/')
 
-    if not os.path.exists(args.path+'/full_review_text.pbz2'):
-        raise Exception('full_review_text.pbz2 not found in --path, please use another path or create the file with clean_data.gen_data()')
-
-    if not os.path.exists(args.path+'/by_rating_range.pbz2'):
-        raise Exception('by_rating_range.pbz2 not found in --path, please use another path or create the file with clean_data.create_hardcoded_ratings_bins')
+#    if not os.path.exists(args.path+'/full_review_text.pbz2'):
+#        raise Exception('full_review_text.pbz2 not found in --path, please use another path or create the file with clean_data.gen_data()')
+#
+#    if not os.path.exists(args.path+'/by_rating_range.pbz2'):
+#        raise Exception('by_rating_range.pbz2 not found in --path, please use another path or create the file with clean_data.create_hardcoded_ratings_bins')
 
     data_configurations = data_configuration_hardcodes()
 

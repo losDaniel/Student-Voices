@@ -1,11 +1,17 @@
 README.md
 setup.py
 student_voices/__init__.py
+student_voices/bert_modelling.py
 student_voices/clean_data.py
 student_voices/ec2_scripts.py
+student_voices/input_example.py
+student_voices/input_features.py
 student_voices/lda_analysis.py
 student_voices/modeling_tools.py
 student_voices/rmt_scraper.py
+student_voices/run_coherence.py
+student_voices/run_lda.py
+student_voices/run_lda_visualization.py
 student_voices/sv_utils.py
 student_voices/visuals.py
 student_voices.egg-info/PKG-INFO

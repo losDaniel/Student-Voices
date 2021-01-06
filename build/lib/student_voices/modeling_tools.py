@@ -2,48 +2,26 @@ import sys
 sys.path.append('../')
 
 import os, re, multiprocessing, string, time
-
 import numpy as np
+import pandas as pd
+
+from path import Path 
+root = Path(os.path.dirname(os.path.abspath(__file__)))
+
 from student_voices import sv_utils as bn 
-
-#import pip._internal
-#try:
-#    import pandas as pd 
-#except:
-#    pip._internal.main(['install', 'pandas'])
-#    import pandas as pd 
-
-#try:
-#    from nltk.stem.wordnet import WordNetLemmatizer
-#except:
-#    pip._internal.main(['install', 'nltk'])
-#    from nltk.stem.wordnet import WordNetLemmatizer
-    
+ 
+from nltk.stem.wordnet import WordNetLemmatizer
 from nltk.stem.porter import PorterStemmer
 from nltk.corpus import stopwords
 from nltk.tokenize import RegexpTokenizer
 
-#try:
-#    from gensim.models.phrases import Phrases, Phraser
-#except:
-#    pip._internal.main(['install', 'gensim'])
-#    from gensim.models.phrases import Phrases, Phraser
+from gensim.models.phrases import Phrases, Phraser
 from gensim.utils import save_as_line_sentence
 from gensim.corpora import Dictionary
+from textblob import TextBlob
 
-#try: 
-#    from sklearn.feature_extraction.text import TfidfVectorizer
-#except: 
-#    pip._internal.main(['install','sklearn'])
-#    from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.svm import LinearSVC 
-
-#try: 
-#    from textblob import TextBlob
-#except: 
-#    pip._internal.main(['install','TextBlob']) # try again just to secure
-#    pip._internal.main(['install','TextBlob'])
-#    from textblob import TextBlob
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
@@ -58,7 +36,7 @@ from sklearn.svm import LinearSVC
 cpu_count = multiprocessing.cpu_count()
 
 # rootpath for the AWS directory 
-os.chdir("/home/ec2-user/efs")
+# os.chdir("/home/ec2-user/efs")
     
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 #-# 1. TEXT CLEANING METHODS  #-#-#-#-#-#
@@ -66,7 +44,7 @@ os.chdir("/home/ec2-user/efs")
 
 
 # import contractions dictionary 
-contractions = bn.loosen(os.getcwd()+'/data/contractions.pickle')
+contractions = bn.loosen(root+'/data/contractions.pickle')
 cnt = {} # we need to create a version the contractions that is compatible with the cleaning step (where apostrophes and lower case has been implemented)
 for c in contractions: 
     w = c.lower().replace("'","")
@@ -79,7 +57,7 @@ del cnt
 stops = set(stopwords.words('english'))
 stops = [s.replace("'",'') for s in stops]
 # pull in other stop words that have been added manually
-for w in open(os.getcwd()+'/data/stop_words.txt','r').read().replace('\n','').replace("'","").split(','):
+for w in open(root+'/data/stop_words.txt','r').read().replace('\n','').replace("'","").split(','):
     if w not in stops: stops.append(w.strip())
    
      
@@ -304,7 +282,6 @@ def populate_stems(word, # the word you want to stem or lemmatize
         stem_map[tok][word] = 1 
         
     return tok
-
 
 # Identify and return phrases 
 def find_phrases(docs, phrase_thresh = 40, gram = 2):
