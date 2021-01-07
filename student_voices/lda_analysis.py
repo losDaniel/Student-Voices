@@ -305,6 +305,7 @@ def determine_coherence(trained_models, dictionary, docs):
 
 
 def write_lda_descriptions(topic_des_path, model, num_words):
+    num_words = int(num_words)
     with open(topic_des_path,'w') as f:
         for t in range(0,model.num_topics):
             f.write('\ntopic {} words: ,'.format(t) + ', '.join([w[0] for w in model.show_topic(t, num_words)]))
