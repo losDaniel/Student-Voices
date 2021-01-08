@@ -23,6 +23,8 @@ def setup_context(setting, config, ntopics_option, full_path, model_dir, clean_d
         range_indices = bn.loosen(root + '/data/by_rating_range.pickle')
     elif corpus_group == 'B': 
         range_indices = bn.loosen(root + '/data/by_rating_range_2.pickle')
+    elif corpus_group == 'C':
+        range_indices = bn.loosen(root + '/data/by_rating_range_3.pickle')
     else: 
         raise "Please submit valid corpus group"
 

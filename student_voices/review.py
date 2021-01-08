@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Jan  8 10:04:45 2021
+import sys
+sys.path.append('../')
 
-@author: Computer
-"""
+from student_voices import sv_utils as bn
 
 import glob 
 import re 
@@ -31,6 +29,19 @@ def get_models_completed(path):
     models_done = pd.DataFrame(models_done)
     
     return models_done 
+
+
+def get_scored_unscored_models(results_path, models_path):
+    full_coherence_data = bn.loosen(results_path+'/full_coherence_data.pickle')
+    completed_models = get_models_completed(models_path)
+    models_scoring = completed_models.merge(full_coherence_data[['Setting','Config','Range','N_Topics']], on=['Setting','Config','Range','N_Topics'], how='outer', indicator=True)
+
+    print(models_scoring['_merge'].value_counts())
+    models_scored = models_scoring[models_scoring['_merge']=='both']
+    models_unscored = models_scoring[models_scoring['_merge']=='left_only']    
+    
+    return models_scored, models_unscored 
+
     
     
     
