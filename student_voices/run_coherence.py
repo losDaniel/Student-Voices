@@ -4,6 +4,7 @@ sys.path.append('../')
 from student_voices import sv_utils as bn
 from student_voices import lda_analysis as ld
 from student_voices import modeling_tools as mt 
+from student_voices import review
 
 import numpy as np
 import argparse, time
@@ -18,9 +19,10 @@ def run_coherence_analysis_ff(data_dir, model_dir, results_dir):
     # import the data if need be
     data = bn.decompress_pickle(root+'/data/review_stats.pbz2')
 
-    unscored_model_list = bn.loosen(from_file)
+    models_completed = review.get_models_completed(model_dir)
+
     # We don't want to be loading the data several times so we will go through the list of models in order, one config at a time
-    configs = list(unscored_model_list['Config'].unique())        
+    configs = list(models_completed['Config'].unique())        
 
     coherence_guide = {}
     ranked_results = pd.DataFrame()
@@ -32,7 +34,7 @@ def run_coherence_analysis_ff(data_dir, model_dir, results_dir):
     for config in configs: 
         text, stem_map, lemma_map, phrase_frequencies = bn.decompress_pickle(data_dir+'/cleaned_docs_'+config+'.pbz2')
 
-        config_models = unscored_model_list[unscored_model_list['Config']==config]
+        config_models = models_completed[models_completed['Config']==config]
         # We'll go through the ranges in order as well because we'll have to laod the corresponding by_rating_range             
         current_ranges = list(config_models['Range'].unique())
 
@@ -49,8 +51,6 @@ def run_coherence_analysis_ff(data_dir, model_dir, results_dir):
     
             # create a list of each range 
             ranges = list(np.sort(list(range_indices.keys())))
-            # import hardcoded lda paramter dictionary 
-            lda_parameters =ld.hardcoded_lda_parameters(ranges, range_indices, numtopics)
 
             range_models = config_models[config_models['Range']==rng]
             
@@ -63,7 +63,9 @@ def run_coherence_analysis_ff(data_dir, model_dir, results_dir):
         
                 model_directory = model_dir+'/'+setting+'_'+config+'/'
 
-        
+                # import hardcoded lda paramter dictionary 
+                lda_parameters =ld.hardcoded_lda_parameters(ranges, range_indices, numtopics=None, custom_numtopics=n_topics_list)
+
                 indices = data.loc[range_indices[rng], 'Review_Length']
                     
                 # filter the training corpus by review length and save the length 
@@ -97,70 +99,70 @@ def run_coherence_analysis_ff(data_dir, model_dir, results_dir):
         bn.compressed_pickle(results_directory+'/full_coherence_'+str(config), coherence_guide)
 
 
-
-def run_coherence_analysis(setting, config, numtopics, data_dir, model_dir, results_dir, corpus_group):
-
-    text, stem_map, lemma_map, phrase_frequencies = bn.decompress_pickle(data_dir+'/cleaned_docs_'+config+'.pbz2')
-
-    model_directory = model_dir+'/'+setting+'_'+config+'/'
-
-    results_directory = results_dir+'/'+setting+'_'+config+'/'
-
-    if not os.path.exists(results_directory): 
-        print('Creating directory ', str(results_directory))
-        os.mkdir(results_directory)
-
-    if corpus_group == 'A': 
-        range_indices = bn.loosen(root + '/data/by_rating_range.pickle')
-    elif corpus_group == 'B': 
-        range_indices = bn.loosen(root + '/data/by_rating_range_2.pickle')
-
-    # import the data if need be
-    data = bn.decompress_pickle(root+'/data/review_stats.pbz2')
-    # create a list of each range 
-    ranges = list(np.sort(list(range_indices.keys())))
-    # import hardcoded lda paramter dictionary 
-    lda_parameters =ld.hardcoded_lda_parameters(ranges, range_indices, numtopics)
-
-    coherence_guide = {}
-    ranked_results = pd.DataFrame()
-
-    st = time.time()
-
-    for rng in ranges: 
-
-        indices = data.loc[range_indices[rng], 'Review_Length']
-            
-        # filter the training corpus by review length and save the length 
-        docs = [text[idx] for idx in indices[indices>lda_parameters[setting][rng]['review_length']].index]
-        
-        # Load the trained models that we're going to compare 
-        trained_models = ld.load_models(model_directory,setting+'_'+config+'_'+rng, list(range(3,30,3))) # this list is the topic numbers that were tried. They are hardcoded but could probably be made an argument later
-    
-        corpus, dictionary, literal_dictionary, id2word, word2id = mt.set_dictionary(docs,
-                                                                                 lda_parameters[setting][rng]['nbelow'],
-                                                                                 lda_parameters[setting][rng]['nabove'])
-        # get the ranked coherence models and the coherence
-        ranked, coherences = ld.determine_coherence(trained_models, dictionary, docs)
-
-        # store the ranked results in a dataset
-        ranked_scores = pd.DataFrame(ranked, columns=['num_topics','ave_coherence_score'])
-        ranked_scores['range']=str(rng)
-        ranked_scores['setting']=str(setting)
-        ranked_scores['config']=str(config)
-        ranked_results = ranked_results.append(ranked_scores)    
-        
-        # store the full coherence scores per topic in a separate dictionary object
-        if rng not in coherence_guide: coherence_guide[rng]={} 
-        if config not in coherence_guide[rng]: coherence_guide[rng][config]={}
-        if setting not in coherence_guide[rng][config]: coherence_guide[rng][config][setting]={}
-    
-        coherence_guide[rng][config][setting] = [(k,coherences[k]) for k in coherences]
-
-        print('Estimating coherence for range '+str(rng)+', setting '+str(setting)+', config '+str(config)+' took '+str(time.time()-st))
-
-    ranked_results.to_csv(results_directory+'/ranked_coherence_'+str(setting)+'_'+str(config)+'.csv')        
-    bn.compressed_pickle(results_directory+'/full_coherence_'+str(setting)+'_'+str(config), coherence_guide)
+# Needs to be updated to exclude the numtopics and corpus group args 
+#def run_coherence_analysis(setting, config, numtopics, data_dir, model_dir, results_dir, corpus_group):
+#
+#    text, stem_map, lemma_map, phrase_frequencies = bn.decompress_pickle(data_dir+'/cleaned_docs_'+config+'.pbz2')
+#
+#    model_directory = model_dir+'/'+setting+'_'+config+'/'
+#
+#    results_directory = results_dir+'/'+setting+'_'+config+'/'
+#
+#    if not os.path.exists(results_directory): 
+#        print('Creating directory ', str(results_directory))
+#        os.mkdir(results_directory)
+#
+#    if corpus_group == 'A': 
+#        range_indices = bn.loosen(root + '/data/by_rating_range.pickle')
+#    elif corpus_group == 'B': 
+#        range_indices = bn.loosen(root + '/data/by_rating_range_2.pickle')
+#
+#    # import the data if need be
+#    data = bn.decompress_pickle(root+'/data/review_stats.pbz2')
+#    # create a list of each range 
+#    ranges = list(np.sort(list(range_indices.keys())))
+#    # import hardcoded lda paramter dictionary 
+#    lda_parameters =ld.hardcoded_lda_parameters(ranges, range_indices, numtopics)
+#
+#    coherence_guide = {}
+#    ranked_results = pd.DataFrame()
+#
+#    st = time.time()
+#
+#    for rng in ranges: 
+#
+#        indices = data.loc[range_indices[rng], 'Review_Length']
+#            
+#        # filter the training corpus by review length and save the length 
+#        docs = [text[idx] for idx in indices[indices>lda_parameters[setting][rng]['review_length']].index]
+#        
+#        # Load the trained models that we're going to compare 
+#        trained_models = ld.load_models(model_directory,setting+'_'+config+'_'+rng, list(range(3,30,3))) # this list is the topic numbers that were tried. They are hardcoded but could probably be made an argument later
+#    
+#        corpus, dictionary, literal_dictionary, id2word, word2id = mt.set_dictionary(docs,
+#                                                                                 lda_parameters[setting][rng]['nbelow'],
+#                                                                                 lda_parameters[setting][rng]['nabove'])
+#        # get the ranked coherence models and the coherence
+#        ranked, coherences = ld.determine_coherence(trained_models, dictionary, docs)
+#
+#        # store the ranked results in a dataset
+#        ranked_scores = pd.DataFrame(ranked, columns=['num_topics','ave_coherence_score'])
+#        ranked_scores['range']=str(rng)
+#        ranked_scores['setting']=str(setting)
+#        ranked_scores['config']=str(config)
+#        ranked_results = ranked_results.append(ranked_scores)    
+#        
+#        # store the full coherence scores per topic in a separate dictionary object
+#        if rng not in coherence_guide: coherence_guide[rng]={} 
+#        if config not in coherence_guide[rng]: coherence_guide[rng][config]={}
+#        if setting not in coherence_guide[rng][config]: coherence_guide[rng][config][setting]={}
+#    
+#        coherence_guide[rng][config][setting] = [(k,coherences[k]) for k in coherences]
+#
+#        print('Estimating coherence for range '+str(rng)+', setting '+str(setting)+', config '+str(config)+' took '+str(time.time()-st))
+#
+#    ranked_results.to_csv(results_directory+'/ranked_coherence_'+str(setting)+'_'+str(config)+'.csv')        
+#    bn.compressed_pickle(results_directory+'/full_coherence_'+str(setting)+'_'+str(config), coherence_guide)
 
 
 
@@ -191,11 +193,10 @@ if __name__ == '__main__':
     parser.add_argument('-cp', '--configpath', help='Path to configuration data', required=True)
     parser.add_argument('-md', '--modeldir', help='Path to save the models', required=True)
     parser.add_argument('-rd', '--resultsdir', help='Path to save the results', required=True)
-    parser.add_argument('-c', '--configuration', help='Configuration (A1,B1,C1,...)', default=None)
-    parser.add_argument('-s', '--setting', help='LDA parameter setting to use from hardcoded options', default=None)
-    parser.add_argument('-nt', '--numtopics', help='Option for the number of topics: A,B,C,...', default=None)
-    parser.add_argument('-cg', '--corpusgrouping', help='Option for the corpus grouping to pick: 1, 2, 3,...', default=None)
-    parser.add_argument('-ff', '--fromfile', help='Run scores for models specified in a file with columns: Setting, Config, Range, N_Topics. Using this option will invalidate the -cg and -nt commands', default=None)
+    #parser.add_argument('-c', '--configuration', help='Configuration (A1,B1,C1,...)', default=None)
+    #parser.add_argument('-s', '--setting', help='LDA parameter setting to use from hardcoded options', default=None)
+    #parser.add_argument('-nt', '--numtopics', help='Option for the number of topics: A,B,C,...', default=None)
+    #parser.add_argument('-cg', '--corpusgrouping', help='Option for the corpus grouping to pick: 1, 2, 3,...', default=None)
 
     args = parser.parse_args()
 
@@ -203,19 +204,16 @@ if __name__ == '__main__':
     model_dir = args.modeldir
     results_dir = args.resultsdir
     
-    if args.fromfile is None: 
-        setting = args.setting
-        config = args.configuration
-        numtopics = args.numtopics
-        corpus_group = args.corpusgrouping
-        assert setting is not None 
-        assert config is not None 
-        assert numtopics is not None 
-        assert corpus_group is not None
-        run_coherence_analysis(setting, config, numtopics, config_path, model_dir, results_dir, corpus_group)
-
-    else:
-        from_file = args.fromfile 
+    run_coherence_analysis_ff(config_path, model_dir, results_dir)
     
-
+#    # This approach will be deprecated 
+#    setting = args.setting
+#    config = args.configuration
+#    numtopics = args.numtopics
+#    corpus_group = args.corpusgrouping
+#    assert setting is not None 
+#    assert config is not None 
+#    assert numtopics is not None 
+#    assert corpus_group is not None
+#    run_coherence_analysis(setting, config, numtopics, config_path, model_dir, results_dir, corpus_group)
 

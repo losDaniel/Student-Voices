@@ -32,12 +32,16 @@ def get_num_topic_option():
 
     return num_topics_options    
 
-def hardcoded_lda_parameters(ranges, range_indices, numtopics): 
+def hardcoded_lda_parameters(ranges, range_indices, numtopics=None, custom_numtopics=None): 
 
     lda_parameters={}
-    
-    num_topics_options = get_num_topic_option()
-    number_of_topics_to_try = num_topics_options[numtopics]
+
+    if custom_numtopics is None:     
+        assert numtopics is not None 
+        num_topics_options = get_num_topic_option()
+        number_of_topics_to_try = num_topics_options[numtopics]
+    else: 
+        number_of_topics_to_try = custom_numtopics
     
     lda_parameters['LDA1']={} 
     for rng in ranges: 
