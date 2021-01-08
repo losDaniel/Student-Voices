@@ -97,6 +97,9 @@ def run_coherence_analysis_ff(data_dir, model_dir, results_dir):
                 print('Estimating coherence for range '+str(rng)+', setting '+str(setting)+', config '+str(config)+' took '+str(time.time()-st))
                 
         bn.compressed_pickle(results_directory+'/full_coherence_'+str(config), coherence_guide)
+        
+    print('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+    print('FINISHED')
 
 
 # Needs to be updated to exclude the numtopics and corpus group args 
