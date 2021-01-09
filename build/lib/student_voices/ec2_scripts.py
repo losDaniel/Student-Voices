@@ -137,10 +137,10 @@ def get_lda_script(config, setting, ntop, corpus_group, model_dir, config_path, 
 
 
 
-def get_coherence_script(config, setting, ntop, corpus_group, model_dir, config_path, results_path, log_file_name, region, cancel_fleet=True, script='', run_as_user='', delimiter='\n'):
+def get_coherence_script(model_dir, config_path, results_path, log_file_name, region, cancel_fleet=True, script='', run_as_user='', delimiter='\n'):
     # To be run within an instance 
     
-    if script=='':    
+    if script=='':      
         # Bash scripts submitted as user data must have the correct header 
         script = bash_scripts.init_userdata_script()
     
@@ -153,7 +153,7 @@ def get_coherence_script(config, setting, ntop, corpus_group, model_dir, config_
     else: 
         script += 'sudo runuser -l '+run_as_user+" -c 'python /home/ec2-user/efs/Student-Voices/student_voices/modeling_tools.py'"+delimiter
 
-    command = 'python /home/ec2-user/efs/Student-Voices/student_voices/run_coherence.py -c '+str(config)+' -cp '+str(config_path)+' -md '+str(model_dir)+' -s '+str(setting)+' -rd '+str(results_path)+' -nt '+str(ntop)+' -cg '+str(corpus_group)
+    command = 'python /home/ec2-user/efs/Student-Voices/student_voices/run_coherence.py '+' -cp '+str(config_path)+' -md '+str(model_dir)+' -rd '+str(results_path)
         
     if cancel_fleet: 
         # Use the package commands to run the job 

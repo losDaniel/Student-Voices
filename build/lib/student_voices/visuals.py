@@ -226,7 +226,7 @@ def get_topic_reviews(topic, reviews, poolsize =50, samplesize = 20, fsize = (8,
     return topic_reviews
 
 
-def plot_dominant_topics(reviews, ex, tc=None, plt_fontsize=14, leg_fontsize=14, newlinechars=120):
+def plot_dominant_topics(reviews, ex=None, tc=None, plt_fontsize=14, leg_fontsize=14, newlinechars=120):
     # set graph colors 
     plt.rcParams['axes.facecolor']= 'gold'
     plt.rcParams['figure.facecolor']= 'lightgray'
@@ -238,13 +238,13 @@ def plot_dominant_topics(reviews, ex, tc=None, plt_fontsize=14, leg_fontsize=14,
     i = 0 
     for key in ex: # for each topic 
         # we make the legend with the detailed descriptions of each topic and insert a new line every `newlinechars`# of characters
-        data_key = mpatches.Patch(color=sns.color_palette('husl',len(ex))[i], label=str(i)+': '+re.sub("(.{"+str(newlinechars)+"})", "\\1\n", list(ex.values())[i], 0, re.DOTALL))
+        data_key = mpatches.Patch(color=sns.color_palette('husl',len(ex))[i], label=str(i)+': '+re.sub("(.{"+str(newlinechars)+"})", "\\1\n", list(ex)[i], 0, re.DOTALL))
         patchList.append(data_key)
         i+=1
 
     # get the value counts for the dominant topics to graph 
     vc = reviews['Dominant_Topic'].value_counts().sort_index()
-    fig = plt.figure(1, figsize=(15,15))
+    fig = plt.figure(1, figsize=(5,5))
     
     fig.suptitle('Number of Reviews Per Topic\n(** next to description = topics that may not be consistent)')
     
@@ -259,7 +259,7 @@ def plot_dominant_topics(reviews, ex, tc=None, plt_fontsize=14, leg_fontsize=14,
         # graph line plot with coherence scores
         sns.lineplot(list(vc.keys().astype(int)), tc, ax=ax2)
     
-    # place the legen below the graph 
+    # place the legend below the graph 
     plt.legend(handles=patchList, loc='upper center', bbox_to_anchor=(0.5, -0.05), fancybox=True, shadow=True)
     plt.show()
     

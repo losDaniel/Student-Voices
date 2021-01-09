@@ -44,4 +44,25 @@ def get_scored_unscored_models(results_path, models_path):
 
     
     
+def get_topic_summary(results_dir, tn, rng, config, setting):
+
+    name = rng+'_'+str(tn)+'_'+setting+'_'+config
+
+    # Get the relevant coherence scores 
+    coherence = bn.decompress_pickle(results_dir+'/complete_coherence.pbz2')
+    topic_coherence = [c for c in coherence[rng][config][setting] if c[0]==10][0][1][0]
+    # Get the relevant reviews 
+    reviews = bn.decompress_pickle(results_dir+'/LDAdistributions/Vec_'+name+'.pbz2')
+    review_dist = list(reviews['Dominant_Topic'].value_counts().sort_index().values)
+    # Get the relevant descriptive words 
+    description = pd.read_csv(results_dir+'/LDAdescriptions/Des_'+name+'.csv', header=None)
+    description = description[['words' in r for r in description[0]]]
+    descriptions = []
+    for idx, row in description.iterrows(): descriptions.append(' '.join(row.values))    
+
+    model_info = pd.DataFrame({'Coherence':topic_coherence, 'NumReviews':review_dist, 'Descriptions':descriptions}).reset_index()
+    model_info['index']=model_info['index']+1
+    model_info = model_info.set_index('index')
+    
+    return model_info
     
