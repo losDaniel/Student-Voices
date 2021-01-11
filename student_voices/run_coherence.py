@@ -48,6 +48,8 @@ def run_coherence_analysis_ff(data_dir, model_dir, results_dir):
                 range_indices = bn.loosen(root + '/data/by_rating_range.pickle')
             elif corpus_group == 'B': 
                 range_indices = bn.loosen(root + '/data/by_rating_range_2.pickle')
+            elif corpus_group == 'C':
+                range_indices = bn.loosen(root + '/data/by_rating_range_3.pickle')
     
             # create a list of each range 
             ranges = list(np.sort(list(range_indices.keys())))
