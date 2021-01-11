@@ -37,7 +37,7 @@ def setup_context(setting, config, ntopics_option, full_path, model_dir, clean_d
     # import hardcoded lda paramter dictionary 
     lda_parameters =ld.hardcoded_lda_parameters(ranges, range_indices, ntopics_option)
 
-    return lda_parameters, data, ranges, range_indices, text, full_text
+    return lda_parameters, data, ranges, range_indices, text, full_text, stem_map, lemma_map, phrase_frequencies
 
 
 def setup_rng_context(rng, range_indices, data, setting, config, lda_parameters, text, full_text, model_dir):
@@ -80,7 +80,7 @@ def run_lda_visualization(setting,
                           vec_dir, 
                           ):
     
-    lda_parameters, data, ranges, range_indices, text, full_text = setup_context(setting, config, ntopics_option, full_path, model_dir, clean_dir, corpus_group)
+    lda_parameters, data, ranges, range_indices, text, full_text, stem_map, lemma_map, phrase_frequencies = setup_context(setting, config, ntopics_option, full_path, model_dir, clean_dir, corpus_group)
         
     trained_models, dictionary, docs, fulldocs, corpus = setup_rng_context(rng, range_indices, data, setting, config, lda_parameters, text, full_text, model_dir)
 

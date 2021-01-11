@@ -116,8 +116,8 @@ def data_configuration_hardcodes():
     
     # fourth configuration - Fasttext cleaning
     data_configurations['D1']={}
-    data_configurations['D1']['lemmatizer']=True
-    data_configurations['D1']['stemmer']=True
+    data_configurations['D1']['lemmatizer']=False
+    data_configurations['D1']['stemmer']=False
     data_configurations['D1']['remove_stops']=True
     data_configurations['D1']['no_not']=None
     data_configurations['D1']['remove_contractions']=True
