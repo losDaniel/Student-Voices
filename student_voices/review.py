@@ -50,7 +50,7 @@ def get_topic_summary(results_dir, tn, rng, config, setting):
 
     # Get the relevant coherence scores 
     coherence = bn.decompress_pickle(results_dir+'/complete_coherence.pbz2')
-    topic_coherence = [c for c in coherence[rng][config][setting] if c[0]==10][0][1][0]
+    topic_coherence = [c for c in coherence[rng][config][setting] if c[0]==tn][0][1][0]
     # Get the relevant reviews 
     reviews = bn.decompress_pickle(results_dir+'/LDAdistributions/Vec_'+name+'.pbz2')
     review_dist = list(reviews['Dominant_Topic'].value_counts().sort_index().values)
@@ -59,6 +59,7 @@ def get_topic_summary(results_dir, tn, rng, config, setting):
     description = description[['words' in r for r in description[0]]]
     descriptions = []
     for idx, row in description.iterrows(): descriptions.append(' '.join(row.values))    
+
 
     model_info = pd.DataFrame({'Coherence':topic_coherence, 'NumReviews':review_dist, 'Descriptions':descriptions}).reset_index()
     model_info['index']=model_info['index']+1

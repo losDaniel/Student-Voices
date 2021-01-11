@@ -140,11 +140,11 @@ if __name__ == '__main__':
     number_of_topics_to_try = num_topics_options[ntopics_option]
     
     if corpus_group == 'A': 
-        range_indices = bn.loosen(root + '/data/by_rating_range.pickle')
+        range_indices = bn.loosen(root + '/data/by_rating_range.pickle') # [0, 35), [35,60), [60,65), [65,75), [75,85), ...]]]]]
     elif corpus_group == 'B': 
-        range_indices = bn.loosen(root + '/data/by_rating_range_2.pickle')
+        range_indices = bn.loosen(root + '/data/by_rating_range_2.pickle') # [0, 60), [0,65)
     elif corpus_group == 'C':
-        range_indices = bn.loosen(root + '/data/by_rating_range_3.pickle')
+        range_indices = bn.loosen(root + '/data/by_rating_range_3.pickle') # [0, 35)
     else: 
         raise "Please submit valid corpus group"
 
