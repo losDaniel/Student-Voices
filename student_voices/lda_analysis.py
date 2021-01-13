@@ -28,7 +28,7 @@ def get_num_topic_option():
     num_topics_options['F'] = [12, 15, 16, 17, 18] 
     num_topics_options['G'] = [19, 20, 21, 22, 23] 
     num_topics_options['H'] = [24, 25, 26, 27]
-    num_topics_options['I'] = [9,19]
+    num_topics_options['I'] = [9,10,19,20]
     num_topics_options['D'] = [4, 5, 7, 8, 10, 11]
     num_topics_options['J'] = [13, 14, 16, 17, 19]
     num_topics_options['K'] = [20, 22, 23, 25, 26]
