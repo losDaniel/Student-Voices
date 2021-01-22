@@ -50,6 +50,12 @@ def run_coherence_analysis_ff(data_dir, model_dir, results_dir):
                 range_indices = bn.loosen(root + '/data/by_rating_range_2.pickle')
             elif corpus_group == 'C':
                 range_indices = bn.loosen(root + '/data/by_rating_range_3.pickle')
+            elif corpus_group == 'D':
+                range_indices = bn.decompress_pickle(root + '/data/by_rating_range_lnd.pbz2')
+            elif corpus_group == 'E':
+                range_indices = bn.decompress_pickle(root + '/data/by_rating_range_noteach.pbz2')
+            else:         
+                raise "Please submit valid corpus group"
     
             # create a list of each range 
             ranges = list(np.sort(list(range_indices.keys())))

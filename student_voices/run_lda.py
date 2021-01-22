@@ -27,12 +27,16 @@ def run_lda_analysis(config, setting, model_dir, config_path, numtopics, corpus_
 
     # import the range indices 
     if corpus_group == 'A': 
-        range_indices = bn.loosen(root + '/data/by_rating_range.pickle') # all 
+        range_indices = bn.loosen(root + '/data/by_rating_range.pickle')
     elif corpus_group == 'B': 
-        range_indices = bn.loosen(root + '/data/by_rating_range_2.pickle') # 0-60, 0-65
+        range_indices = bn.loosen(root + '/data/by_rating_range_2.pickle')
     elif corpus_group == 'C':
-        range_indices = bn.loosen(root + '/data/by_rating_range_3.pickle') # 0-35 only
-    else: 
+        range_indices = bn.loosen(root + '/data/by_rating_range_3.pickle')
+    elif corpus_group == 'D':
+        range_indices = bn.decompress_pickle(root + '/data/by_rating_range_lnd.pbz2')
+    elif corpus_group == 'E':
+        range_indices = bn.decompress_pickle(root + '/data/by_rating_range_noteach.pbz2')
+    else:         
         raise "Please submit valid corpus group"
         
     # create a list of each range 

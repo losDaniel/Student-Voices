@@ -32,6 +32,9 @@ def get_num_topic_option():
     num_topics_options['D'] = [4, 5, 7, 8, 10, 11]
     num_topics_options['J'] = [13, 14, 16, 17, 19]
     num_topics_options['K'] = [20, 22, 23, 25, 26]
+    num_topics_options['L'] = list(range(4,15))
+    num_topics_options['M'] = list(range(15,24))
+
 
     return num_topics_options    
 
@@ -45,6 +48,20 @@ def hardcoded_lda_parameters(ranges, range_indices, numtopics=None, custom_numto
         number_of_topics_to_try = num_topics_options[numtopics]
     else: 
         number_of_topics_to_try = custom_numtopics
+
+
+    lda_parameters['LDA0']={} 
+    for rng in ranges: 
+        corp_len = len(range_indices[rng])
+    
+        lda_parameters['LDA0'][rng]={}
+        lda_parameters['LDA0'][rng]['ntrange'] = number_of_topics_to_try
+        lda_parameters['LDA0'][rng]['review_length'] = 80
+        lda_parameters['LDA0'][rng]['passes'] = 64
+        lda_parameters['LDA0'][rng]['nbelow'] = 30
+        lda_parameters['LDA0'][rng]['nabove'] = .4
+        lda_parameters['LDA0'][rng]['corpus_length']=corp_len   
+
     
     lda_parameters['LDA1']={} 
     for rng in ranges: 
