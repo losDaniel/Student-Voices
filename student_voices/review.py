@@ -16,7 +16,7 @@ def get_models_completed(path):
     for directory in model_directories: 
         model_names = glob.glob(directory+'/*.lda')
         for mn in model_names: 
-            setting, config = directory.split('/')[-1].split('_')
+            setting, config = directory.split('/')[-1].split('_', 1)
             setting = setting.split('\\')[-1]
             rng = re.findall('\[.*\)', mn)[0]
             n_topics = int(re.findall('\)([0-9]*)\.', mn)[0])
