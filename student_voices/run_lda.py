@@ -33,7 +33,7 @@ def run_lda_analysis(config, setting, model_dir, config_path, numtopics, corpus_
     elif corpus_group == 'C':
         range_indices = bn.loosen(root + '/data/by_rating_range_3.pickle')
     elif corpus_group == 'D':
-        range_indices = bn.decompress_pickle(root + '/data/by_rating_range_lnd.pbz2')
+        range_indices = bn.decompress_pickle(root + '/data/by_rating_range_lnd.pbz2')  # Only [0,35)
     elif corpus_group == 'E':
         range_indices = bn.decompress_pickle(root + '/data/by_rating_range_noteach.pbz2')
     else:         
