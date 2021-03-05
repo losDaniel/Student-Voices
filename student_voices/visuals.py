@@ -194,7 +194,7 @@ def plot_restricted_review_dists(data, save=None):
         
         
 # Function to describe the topics 
-def get_topic_reviews(topic, reviews, poolsize =50, samplesize = 20, fsize = (8,8)):
+def get_topic_reviews(topic, reviews, poolsize =50, samplesize = 20, fsize = (8,8), boundary=False, graph=True, get_series=None, save_at=None, print_topics=False):
     # set graph colors 
     plt.rcParams['axes.facecolor']= 'gold'
     plt.rcParams['figure.facecolor']= 'lightgray'
@@ -202,26 +202,52 @@ def get_topic_reviews(topic, reviews, poolsize =50, samplesize = 20, fsize = (8,
     # get the reviews for the specified topic 
     topic_reviews = reviews.loc[reviews['Dominant_Topic']==topic].sort_values(by=['Dominant_Topic','Topic_Perc_Contrib'], ascending=[False, False])
     
+    print('There are '+str(len(topic_reviews))+' reviews dominated by this Topic')
     # get the keywords for the topics
     keywords = ', '.join(list(topic_reviews[:1]['Keywords'].values))
 
     # show the key words 
     print(keywords)
 
-    # instantiate the plot 
-    fig = plt.figure(1, figsize = fsize)
-    ax = fig.add_subplot(111)
+    if graph is True:
+        # instantiate the plot 
+        fig = plt.figure(1, figsize = fsize)
+        ax = fig.add_subplot(111)
+        
+        # plot the distribution of the percentage contribution of the topic to each review that has the given topic as a dominant topic
+        sns.distplot(topic_reviews['Topic_Perc_Contrib'], ax=ax)
+        plt.show()
     
-    # plot the distribution of the percentage contribution of the topic to each review that has the given topic as a dominant topic
-    sns.distplot(topic_reviews['Topic_Perc_Contrib'], ax=ax)
-    plt.show()
-    
-    # select a random sample of reviews from a pool of size poolsize  
-    sample = random.sample(list(topic_reviews['Text'][:poolsize].values),samplesize)
-    # display each review
-    print('\n')
-    for s in sample:
-        print(s.replace('Submitted by a student','').strip(),'\n')
+    if not boundary: 
+        # select a random sample of reviews from a pool of size poolsize  
+        sample = random.sample(list(topic_reviews['Text'][:poolsize].values),samplesize)
+    elif boundary: 
+        
+        if get_series is not None: 
+            full_sample = []
+            for ps in get_series: 
+                for review in list(topic_reviews['Text'][:ps].values)[-samplesize:]:
+                    full_sample.append(review)
+            
+            indexes = [i for i in [list(range(samp-2, samp+1)) for samp in get_series]]
+            index_list = []
+            for lidx in indexes:
+                for i in lidx:
+                    index_list.append(i)
+            
+            sample = pd.DataFrame({'Text':full_sample}, index=index_list)
+
+            if save_at is not None:
+                sample.to_csv(save_at)
+
+        else: 
+            sample = list(topic_reviews['Text'][:poolsize].values)[-samplesize:]
+        
+    if print_topics:
+        # display each review
+        print('\n')
+        for s in sample:
+            print(s.replace('Submitted by a student','').replace('Submitted by a parent','').strip(),'\n')
     
     return topic_reviews
 
