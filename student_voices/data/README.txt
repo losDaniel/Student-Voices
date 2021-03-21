@@ -1,0 +1,3 @@
+We didn't run all models for all specifications. Rather, we ran some models, found the best and then ran more in that neighborhood until we determined the best setting for some of the experimental parameters. Each by_rating_range*.pickle files are different extensions of the experiment that were run on the cloud as we iterated through. 
+
+All other data files are original and are either some form of the student data we scraped, some part of the analysis or data we downloaded from the national center for education statistics which merges into the data by name. A fuzzy merge may improve performance of that merge. 

@@ -8,6 +8,14 @@ import matplotlib.patches as mpatches
 import pyLDAvis
 import pyLDAvis.gensim
 import re 
+import plotly.express as px
+
+
+def plot_basic_theme_dist(basic_dist):
+    fig = px.bar(basic_dist, x='theme', y='p',
+                 color='p',
+                 height=400)
+    fig.show()
 
 def display_side_by_side(*args):
     '''Display the given tables side by side'''
@@ -192,9 +200,10 @@ def plot_restricted_review_dists(data, save=None):
     if save is not None: 
         fig.savefig(save)
         
-        
+# DEPRECATED PARAMS : poolsize =50, samplesize = 20, boundary=False, get_series=None,    
 # Function to describe the topics 
-def get_topic_reviews(topic, reviews, poolsize =50, samplesize = 20, fsize = (8,8), boundary=False, graph=True, get_series=None, save_at=None, print_topics=False):
+def get_topic_reviews(topic, reviews,  fsize = (8,8), graph=True, get_percentiles=None, save_at=None, print_topics=False, verbose=False):
+
     # set graph colors 
     plt.rcParams['axes.facecolor']= 'gold'
     plt.rcParams['figure.facecolor']= 'lightgray'
@@ -202,12 +211,12 @@ def get_topic_reviews(topic, reviews, poolsize =50, samplesize = 20, fsize = (8,
     # get the reviews for the specified topic 
     topic_reviews = reviews.loc[reviews['Dominant_Topic']==topic].sort_values(by=['Dominant_Topic','Topic_Perc_Contrib'], ascending=[False, False])
     
-    print('There are '+str(len(topic_reviews))+' reviews dominated by this Topic')
-    # get the keywords for the topics
-    keywords = ', '.join(list(topic_reviews[:1]['Keywords'].values))
-
-    # show the key words 
-    print(keywords)
+    if verbose: 
+        print('There are '+str(len(topic_reviews))+' reviews dominated by this Topic')
+        # get the keywords for the topics
+        keywords = ', '.join(list(topic_reviews[:1]['Keywords'].values))
+        # show the key words 
+        print(keywords)
 
     if graph is True:
         # instantiate the plot 
@@ -218,30 +227,45 @@ def get_topic_reviews(topic, reviews, poolsize =50, samplesize = 20, fsize = (8,
         sns.distplot(topic_reviews['Topic_Perc_Contrib'], ax=ax)
         plt.show()
     
-    if not boundary: 
-        # select a random sample of reviews from a pool of size poolsize  
-        sample = random.sample(list(topic_reviews['Text'][:poolsize].values),samplesize)
-    elif boundary: 
-        
-        if get_series is not None: 
-            full_sample = []
-            for ps in get_series: 
-                for review in list(topic_reviews['Text'][:ps].values)[-samplesize:]:
-                    full_sample.append(review)
-            
-            indexes = [i for i in [list(range(samp-2, samp+1)) for samp in get_series]]
-            index_list = []
-            for lidx in indexes:
-                for i in lidx:
-                    index_list.append(i)
-            
-            sample = pd.DataFrame({'Text':full_sample}, index=index_list)
+    if get_percentiles is not None: 
+        indices = [] 
+        full_sample = [] 
+        for p in get_percentiles: 
+            index_num = int(np.floor(len(topic_reviews)*(p/100)))
+            review = topic_reviews.iloc[index_num]['Text'].replace('Submitted by a student','').replace('Submitted by a Parent','').strip()
+            indices.append(index_num)
+            full_sample.append(review)
 
-            if save_at is not None:
-                sample.to_csv(save_at)
+        sample = pd.DataFrame({'Text':full_sample}, index=indices)    
 
-        else: 
-            sample = list(topic_reviews['Text'][:poolsize].values)[-samplesize:]
+        if save_at is not None: 
+            sample.to_csv(save_at)
+
+# DEPRECATED UTILITY 
+    # elif not boundary: 
+    #     # select a random sample of reviews from a pool of size poolsize  
+    #     sample = random.sample(list(topic_reviews['Text'][:poolsize].values),samplesize)
+    
+    # elif boundary:     
+    #     if get_series is not None: 
+    #         full_sample = []
+    #         for ps in get_series: 
+    #             for review in list(topic_reviews['Text'][:ps].values)[-samplesize:]:
+    #                 full_sample.append(review)
+            
+    #         indexes = [i for i in [list(range(samp-2, samp+1)) for samp in get_series]]
+    #         index_list = []
+    #         for lidx in indexes:
+    #             for i in lidx:
+    #                 index_list.append(i)
+            
+    #         sample = pd.DataFrame({'Text':full_sample}, index=index_list)
+
+    #         if save_at is not None:
+    #             sample.to_csv(save_at)
+
+    #     else: 
+    #         sample = list(topic_reviews['Text'][:poolsize].values)[-samplesize:]
         
     if print_topics:
         # display each review

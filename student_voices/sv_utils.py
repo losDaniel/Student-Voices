@@ -101,6 +101,27 @@ def decompress_pickle(filename):
     return data
 
 
+def import_full_excel(xl_file):
+    '''Returns a dictionary with the sheet names as keys and the data as values
+    - xl_file : string. filepath to excel file 
+    '''
+    xls = pd.ExcelFile(xl_file)
+
+    db = {} 
+    for sheet in xls.sheet_names: 
+        db[sheet] = pd.read_excel(xls, sheet)    # read in the excel sheets 
+        db[sheet] = db[sheet].fillna(0)          # fill in the missing values with 0's 
+        for c in db[sheet].columns:              # make numeric fields integers
+            try: 
+                db[sheet][c] = db[sheet][c].astype(int)
+            except: 
+                pass
+        
+    print("Sheet names are: "+", ".join(list(db.keys())))
+
+    return db
+
+
 def rename(data, oldnames, newname): 
     if type(oldnames) == str:
         oldnames = [oldnames]
