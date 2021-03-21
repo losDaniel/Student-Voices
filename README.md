@@ -6,7 +6,7 @@ Valcarcel, C. Holmes, J. Berliner, D.C. Koerner, M. (2021). *The Value of Studen
 
 Graphs and other results can be found in their respective directories. For this analysis we scraped millions of teacher reviews submitted by students and parents and used  natural language processing to retrieve patterns in how students describe their teachers and classes across the U.S. The graph below shows the reviews, clustered by a 20-topic LDA model and plotted in two dimensions. They are color coded according the general theme associations found in a thematic analysis of sample reviews.
 
-<img src="https://github.com/losDaniel/Student-Voices/blob/master/graphs/Thematic%202d%20Plot%20Color.png" width="200" height="200">
+<div style="text-align:center"><img src="https://github.com/losDaniel/Student-Voices/blob/master/graphs/Thematic%202d%20Plot%20Color.png" width="550" height="500"></div>
 
 ## Data & The Scraper 
 
