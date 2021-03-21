@@ -1,0 +1,7 @@
+Drop duplicates when the data gets loaded: 
+	load the data and verify that this is being done correctly. 
+	No, it has to be done with the by ratings range. 
+
+! Create new datasets and new by ratings range 
+	remove the word teacher 
+	remove duplicates
