@@ -2,7 +2,7 @@
 
 This is the project repository for: 
 
-*Valcarcel, C. Holmes, J. Berliner, D. Koerner, M. (2021). The Value of Student Feedback in Open Forums: A Natural Analysis of Descriptions of Poorly-Rated Teachers. Education Policy Analysis Archives, 26(number).* 
+Valcarcel, C. Holmes, J. Berliner, D. Koerner, M. (2021). *The Value of Student Feedback in Open Forums: A Natural Analysis of Descriptions of Poorly-Rated Teachers.* Education Policy Analysis Archives, 26(number). 
 
 Graphs and other results can be found in their respective directories. For this analysis we scraped millions of teacher reviews submitted by students and parents and used  natural language processing to retrieve patterns in how students describe their teachers and classes across the U.S. 
 
